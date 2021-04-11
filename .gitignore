@@ -1,0 +1,10 @@
+.git
+node_modules
+.env
+
+# macOS
+.DS_Store
+._*
+
+# just for now
+docs/
