@@ -3,7 +3,6 @@ var express = require('express');
 var api_response = require('../lib/response');
 
 // Load database
-var Game = require('../models/Game.js');
 var Device = require('../models/Device.js');
 var Manufacturer = require('../models/Manufacturer.js');
 
@@ -29,11 +28,30 @@ router.post('/', async function(req, res) {
     // TODO: Don't allow submissions if fields are missing
     const data = req.body;
 
+    // Get device manufacturer's ID
+    var getManufacturer = await Manufacturer.findOne({
+        where: {
+            name: data.manufacturer
+        }
+    })
+    .then(function(model) {
+        return model;
+    })
+    .catch(function(error) {
+        return false;
+    });
+
+    if(! getManufacturer) {
+        return api_response(res, 404, "NotFoundError", {
+            "message": "The specified manufacturer does not exist."
+        });
+    }
+
     // Create a new device
     var createDevice = await Device.create({
         name: data.name,
         shortname: data.shortname,
-        ManufacturerId: data.manufacturer,
+        ManufacturerId: getManufacturer.id, // Manufacturer ID from above
         year: data.year
     }).then(function(value) {
         // Device creation successful
