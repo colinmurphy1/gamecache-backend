@@ -1,11 +1,13 @@
 var express = require('express');
 var argon2 = require('argon2');
 var crypto = require('crypto');
+const Joi = require('joi');
 
 var api_response = require('../lib/response');
 var hashPassword = require('../lib/hash_password.js');
 
 var User = require('../models/User.js');
+
 
 var router = express.Router();
 
@@ -13,6 +15,19 @@ var router = express.Router();
 router.post('/register', async function(req, res) {
     // {"username": "username-here", "email": "email-here", "password": "password-here"}
     const data = req.body;
+
+    // Validate user input
+    const schema = Joi.object({
+        username: Joi.string().alphanum().max(16),
+        email: Joi.string().email(),
+        password: Joi.string().min(8)
+    });
+
+    const {error, value} = schema.validate(data, {abortEarly: false});
+
+    if (error) {
+        return api_response(res, 400, "InputValidationError", value);
+    }
 
     // Create a new user 
     var createUser = await User.create({
@@ -42,6 +57,18 @@ router.post('/login', async function(req, res) {
     // {"username": "Username-Here", "password": "Password-Here"}
     const data = req.body;
     
+    // Validate user input
+    const schema = Joi.object({
+        username: Joi.string().alphanum().max(16),
+        password: Joi.string().min(8)
+    });
+
+    const {error, value} = schema.validate(data, {abortEarly: false});
+
+    if (error) {
+        return api_response(res, 400, "InputValidationError", value);
+    }
+
     // Search for the user in the User table
     var user = await User.findOne({
         where: {

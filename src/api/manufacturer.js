@@ -1,10 +1,12 @@
 // Load modules
 var express = require('express');
+const Joi = require('joi');
+
 var api_response = require('../lib/response');
 
 // Load database
-var Device = require('../models/Device.js');
 var Manufacturer = require('../models/Manufacturer.js');
+
 
 var router = express.Router();
 
@@ -18,6 +20,17 @@ router.get('/', async function(req, res) {
 // Add manufacturer (this will be admin only)
 router.post('/', async function(req, res) {
     const data = req.body;
+
+    // Verify that all required data is passed
+    const schema = Joi.object({
+        name: Joi.string().required()
+    });
+
+    const {error, value} = schema.validate(data, {abortEarly: false});
+
+    if (error) {
+        return api_response(res, 400, "InputValidationError", value);
+    }
 
     var createManufacturer = await Manufacturer.create({
         name: data.name

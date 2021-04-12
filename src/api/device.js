@@ -1,5 +1,6 @@
 // Load modules
 var express = require('express');
+const Joi = require('joi');
 var api_response = require('../lib/response');
 
 // Load database
@@ -17,34 +18,28 @@ router.get('/', async function(req, res) {
 
 // Add device (this will be admin only)
 router.post('/', async function(req, res) {
-
-    // TODO: Don't allow submissions if fields are missing
     const data = req.body;
 
-    // Get device manufacturer's ID
-    var getManufacturer = await Manufacturer.findOne({
-        where: {
-            name: data.manufacturer
-        }
-    })
-    .then(function(model) {
-        return model;
-    })
-    .catch(function(error) {
-        return false;
+    // Verify that all required data is passed
+    const schema = Joi.object({
+        name: Joi.string().required(),
+        shortname: Joi.string().alphanum().max(10).required(),
+        manufacturer: Joi.number().required(),
+        year: Joi.number().required()
     });
 
-    if(! getManufacturer) {
-        return api_response(res, 404, "NotFoundError", {
-            "message": "The specified manufacturer does not exist."
-        });
+    const {error, value} = schema.validate(data, {abortEarly: false});
+
+    if (error) {
+        return api_response(res, 400, "InputValidationError", value);
     }
+
 
     // Create a new device
     var createDevice = await Device.create({
         name: data.name,
         shortname: data.shortname,
-        ManufacturerId: getManufacturer.id, // Manufacturer ID from above
+        ManufacturerId: data.manufacturer,
         year: data.year
     }).then(function(value) {
         // Device creation successful
