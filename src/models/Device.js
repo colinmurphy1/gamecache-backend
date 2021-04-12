@@ -2,6 +2,8 @@ const { DataTypes } = require('sequelize');
 
 var sequelize = require('../database/db.js');
 
+const Manufacturer = require('./Manufacturer.js');
+
 // Device/Console
 const Device = sequelize.define('Device', {
     // Console name (eg. PlayStation 3)
@@ -18,12 +20,6 @@ const Device = sequelize.define('Device', {
         unique: true
     },
 
-    // Console manufacturer
-    manufacturer: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-
     // Console year
     year: {
         type: DataTypes.INTEGER,
@@ -31,6 +27,9 @@ const Device = sequelize.define('Device', {
     }
 });
 
+// A Manufacturer has many Devices, but a Device only has one Manufacturer
+Manufacturer.hasMany(Device);
+Device.belongsTo(Manufacturer);
 
 //Device.sync();
 

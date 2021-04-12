@@ -5,6 +5,7 @@ var api_response = require('../lib/response');
 // Load database
 var Game = require('../models/Game.js');
 var Device = require('../models/Device.js');
+var Manufacturer = require('../models/Manufacturer.js');
 
 var router = express.Router();
 
@@ -12,7 +13,13 @@ var router = express.Router();
 // Device (console) list
 router.get('/', async function(req, res) {
     var consoles = await Device.findAll();
-    return api_response(res, 200, "OK", consoles)
+    return api_response(res, 200, "OK", consoles);
+});
+
+// Manufacturer list
+router.get('/manufacturer', async function(req, res) {
+    var manufacturer = await Manufacturer.findAll();
+    return api_response(res, 200, "OK", manufacturer);
 });
 
 
@@ -26,10 +33,10 @@ router.post('/', async function(req, res) {
     var createDevice = await Device.create({
         name: data.name,
         shortname: data.shortname,
-        manufacturer: data.manufacturer,
+        ManufacturerId: data.manufacturer,
         year: data.year
     }).then(function(value) {
-        // user creation successful
+        // Device creation successful
         return true;
     })
     .catch(function(error) {
@@ -38,12 +45,43 @@ router.post('/', async function(req, res) {
     });
 
     if (! createDevice) {
-        return api_response(res, 500, "AddDeviceFailed", {"message": "Could not add device"})
+        return api_response(res, 500, "AddDeviceFailed", {
+            "message": "Could not add device"
+        });
     }
 
-    return api_response(res, 200, "OK", {"message": `Added ${data.name} to database.`})
+    return api_response(res, 200, "OK", {
+        "message": `Added ${data.name} to device database.`
+    });
 });
 
+
+// Add manufacturer (this will be admin only)
+router.post('/manufacturer', async function(req, res) {
+    const data = req.body;
+
+    var createManufacturer = await Manufacturer.create({
+        name: data.name
+    }).then(function(value) {
+        // Manufacturer creation successful
+        return true;
+    })
+    .catch(function(error) {
+        // Error encountered while creating device
+        return false;
+    });
+
+    if (! createManufacturer) {
+        return api_response(res, 500, "AddManufacturerFailed",
+        {
+            "message": "Could not add manufacturer"
+        });
+    }
+
+    return api_response(res, 200, "OK", {
+        "message": `Added ${data.name} to manufacturer database.`
+    });
+});
 
 
 module.exports = router;

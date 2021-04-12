@@ -32,7 +32,7 @@ router.get('/all', async function(req, res) {
     })
     .catch(function(error) {
         return false
-    })
+    });
 
     if (! getUsers) {
         return api_response(res, 500, "UserLoadError", {
