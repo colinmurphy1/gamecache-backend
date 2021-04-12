@@ -11,6 +11,7 @@ var auth = require('./api/auth.js');
 var profile = require('./api/profile.js');
 var games = require('./api/games.js');
 var device = require('./api/device.js');
+var manufacturer = require('./api/manufacturer.js');
 
 
 // *****************************************************************************
@@ -44,6 +45,7 @@ app.use('/api/auth', auth);
 app.use('/api/profile', profile);
 app.use('/api/games', games);
 app.use('/api/device', device);
+app.use('/api/manufacturer', manufacturer);
 
 
 // *****************************************************************************
