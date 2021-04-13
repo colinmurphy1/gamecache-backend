@@ -5,7 +5,7 @@ var api_response = require('../lib/response');
 
 // Load database
 var Device = require('../models/Device.js');
-var Manufacturer = require('../models/Manufacturer.js');
+
 
 var router = express.Router();
 
