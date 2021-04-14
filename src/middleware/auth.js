@@ -23,12 +23,12 @@ async function auth(req, res, next) {
         return false;
     });
 
-    // No users have this token, not valid user
+    // No users have this token, token is invalid
     if (! user) {
-        return api_response(res, 404, "UserNotValid", "");
+        return api_response(res, 404, "InvalidTokenError", "");
     }
 
-    // Ensure that the token has not yet expired
+    // Check if the token has expired
     if (user.token_expires_at < Date.now()) {
         return api_response(res, 401, "ExpiredTimestamp", "");
     }
