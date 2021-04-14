@@ -3,6 +3,7 @@ var express = require('express');
 const Joi = require('joi');
 
 var api_response = require('../lib/response');
+var auth_admin = require('../middleware/auth_admin.js');
 
 // Load database
 var Manufacturer = require('../models/Manufacturer.js');
@@ -17,8 +18,8 @@ router.get('/', async function(req, res) {
 });
 
 
-// Add manufacturer (this will be admin only)
-router.post('/', async function(req, res) {
+// Add manufacturer (Admin only)
+router.post('/', auth_admin, async function(req, res) {
     const data = req.body;
 
     // Verify that all required data is passed

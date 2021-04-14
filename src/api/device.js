@@ -1,7 +1,9 @@
 // Load modules
 var express = require('express');
 const Joi = require('joi');
+
 var api_response = require('../lib/response');
+var auth_admin = require('../middleware/auth_admin.js');
 
 // Load database
 var Device = require('../models/Device.js');
@@ -17,7 +19,7 @@ router.get('/', async function(req, res) {
 });
 
 // Add device (this will be admin only)
-router.post('/', async function(req, res) {
+router.post('/', auth_admin, async function(req, res) {
     const data = req.body;
 
     // Verify that all required data is passed

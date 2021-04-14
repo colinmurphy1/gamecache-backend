@@ -1,7 +1,9 @@
 // Load modules
 var express = require('express');
-var api_response = require('../lib/response');
 const Joi = require('joi');
+
+var api_response = require('../lib/response');
+var auth_admin = require('../middleware/auth_admin.js');
 
 // Load database
 var Game = require('../models/Game.js');
@@ -47,7 +49,7 @@ router.get('/', async function(req, res) {
 });
 
 
-/* Add a game */
+// Add a game
 router.post('/', async function(req, res) {
     const data = req.body;
 
@@ -89,8 +91,8 @@ router.post('/', async function(req, res) {
     return api_response(res, 200, "OK", "");
 });
 
-/* Delete a game */
-router.delete('/', async function(req, res) {
+// Delete a game (Admin only)
+router.delete('/', auth_admin, async function(req, res) {
     const data = req.body;
 
     // Validate input
