@@ -4,7 +4,6 @@ var crypto = require('crypto');
 const Joi = require('joi');
 
 var api_response = require('../lib/response');
-var hashPassword = require('../lib/hash_password.js');
 
 var User = require('../models/User.js');
 
@@ -33,7 +32,6 @@ router.post('/register', async function(req, res) {
     var createUser = await User.create({
         username: data.username,
         email: data.email,
-        //password: await hashPassword(data.password)
         password: await argon2.hash(data.password)
     }).then(function(value) {
         // user creation successful
