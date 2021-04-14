@@ -89,5 +89,43 @@ router.post('/', async function(req, res) {
     return api_response(res, 200, "OK", "");
 });
 
+/* Delete a game */
+router.delete('/', async function(req, res) {
+    const data = req.body;
+
+    // Validate input
+    const schema = Joi.object({
+        id: Joi.number().required()
+    });
+
+    const {error, value} = schema.validate(data, {abortEarly: false});
+    
+    if (error) {
+        return api_response(res, 400, "InputValidationError", value);
+    }
+
+    // Find game by ID
+    var deleteGame = await Game.findOne({
+        where: {
+            id: data.id
+        }
+    })
+    .then(function(model) {
+        return model;
+    })
+    .catch(function(error) {
+        return false;
+    });
+
+    if (! deleteGame) {
+        return api_response(res, 404, "GameNotFound", "");
+    }
+
+    // Delete it
+    deleteGame.destroy();
+
+    return api_response(res, 200, "OK", "");
+});
+
 
 module.exports = router;
