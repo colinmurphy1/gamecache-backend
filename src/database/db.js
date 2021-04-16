@@ -13,4 +13,40 @@ const sequelize = new Sequelize(
     }
 );
 
-module.exports = sequelize;
+
+/*
+    Define models
+*/
+
+const db = {}
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
+
+db.User = require('../models/User')(sequelize, Sequelize);
+db.Manufacturer = require('../models/Manufacturer')(sequelize, Sequelize);
+db.Device = require('../models/Device')(sequelize, Sequelize);
+db.Game = require('../models/Game')(sequelize, Sequelize);
+db.UserGame = require('../models/UserGame')(sequelize, Sequelize);
+
+
+/*
+    Database associations
+*/
+
+// Manufacturer has many Devices
+db.Manufacturer.hasMany(db.Device);
+db.Device.belongsTo(db.Manufacturer);
+
+// A Device has many Games
+db.Device.hasMany(db.Game);
+db.Game.belongsTo(db.Device);
+
+// M-M relationship for game collection
+db.User.belongsToMany(db.Game, { through: "UserGame" });
+db.Game.belongsToMany(db.User, { through: "UserGame" });
+
+
+// Sync database models
+db.sequelize.sync();
+
+module.exports = db;

@@ -7,10 +7,7 @@ var auth = require('../middleware/auth.js');
 var auth_admin = require('../middleware/auth_admin.js');
 
 // Load database
-var Game = require('../models/Game.js');
-var Device = require('../models/Device.js');
-var User = require('../models/User.js');
-var UserGame = require('../models/UserGame.js');
+var db = require('../database/db.js');
 
 var router = express.Router();
 
@@ -18,8 +15,8 @@ var router = express.Router();
 router.get('/', async function(req, res) {
 
     // Find all games and their associated console (device)
-    var getGames = await Game.findAll({
-        include: Device
+    var getGames = await db.Game.findAll({
+        include: db.Device
     })
     .then(function(model) {
         return model;
@@ -71,7 +68,7 @@ router.post('/', auth, async function(req, res) {
     }
 
     // Create game entry in the database
-    var newGame = await Game.create({
+    var newGame = await db.Game.create({
         title: data.title,
         publisher: data.publisher,
         year: data.year,
@@ -110,7 +107,7 @@ router.delete('/', auth_admin, async function(req, res) {
     }
 
     // Find game by ID
-    var deleteGame = await Game.findOne({
+    var deleteGame = await db.Game.findOne({
         where: {
             id: data.id
         }

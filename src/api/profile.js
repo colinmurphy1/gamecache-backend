@@ -4,7 +4,8 @@ const { Op } = require('sequelize');
 var api_response = require('../lib/response');
 var auth = require('../middleware/auth.js');
 
-const User = require('../models/User.js');
+// Load database
+var db = require('../database/db.js');
 
 var router = express.Router();
 
@@ -18,7 +19,7 @@ router.get('/all', async function(req, res) {
     
     // Get all users that have public profiles, including the current
     // logged in user
-    var getUsers = await User.findAll({
+    var getUsers = await db.User.findAll({
         where: {
             [Op.or]: [
                 {public_profile: true},
@@ -61,7 +62,7 @@ router.get('/:username', async function(req, res) {
     const username = req.params['username'];
 
     // Find user
-    var getUser = await User.findOne({
+    var getUser = await db.User.findOne({
         where: {
             username: username
         }

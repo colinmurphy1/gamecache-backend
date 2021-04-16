@@ -1,9 +1,10 @@
-var User = require('../models/User.js');
+// Load database
+var db = require('../database/db.js');
 
 // Finds a user account using their current authentication token, returning
 // the sequelize model.
 async function getUserByToken(token) {
-    return await User.findOne({
+    return await db.User.findOne({
         where: {
             token: token
         }

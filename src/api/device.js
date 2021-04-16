@@ -6,15 +6,16 @@ var api_response = require('../lib/response');
 var auth_admin = require('../middleware/auth_admin.js');
 
 // Load database
-var Device = require('../models/Device.js');
-
+var db = require('../database/db.js');
 
 var router = express.Router();
 
 
 // Device (console) list
 router.get('/', async function(req, res) {
-    var consoles = await Device.findAll();
+    var consoles = await db.Device.findAll({
+        include: db.Manufacturer
+    });
     return api_response(res, 200, "OK", consoles);
 });
 
@@ -38,7 +39,7 @@ router.post('/', auth_admin, async function(req, res) {
 
 
     // Create a new device
-    var createDevice = await Device.create({
+    var createDevice = await db.Device.create({
         name: data.name,
         shortname: data.shortname,
         ManufacturerId: data.manufacturer,

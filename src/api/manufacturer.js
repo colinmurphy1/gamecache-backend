@@ -6,14 +6,13 @@ var api_response = require('../lib/response');
 var auth_admin = require('../middleware/auth_admin.js');
 
 // Load database
-var Manufacturer = require('../models/Manufacturer.js');
-
+var db = require('../database/db.js');
 
 var router = express.Router();
 
 // Manufacturer list
 router.get('/', async function(req, res) {
-    var manufacturer = await Manufacturer.findAll();
+    var manufacturer = await db.Manufacturer.findAll();
     return api_response(res, 200, "OK", manufacturer);
 });
 
@@ -33,7 +32,7 @@ router.post('/', auth_admin, async function(req, res) {
         return api_response(res, 400, "InputValidationError", value);
     }
 
-    var createManufacturer = await Manufacturer.create({
+    var createManufacturer = await db.Manufacturer.create({
         name: data.name
     }).then(function(value) {
         // Manufacturer creation successful

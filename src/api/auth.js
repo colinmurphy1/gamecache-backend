@@ -5,8 +5,7 @@ const Joi = require('joi');
 
 var api_response = require('../lib/response');
 
-var User = require('../models/User.js');
-
+var db = require('../database/db.js');
 
 var router = express.Router();
 
@@ -29,7 +28,7 @@ router.post('/register', async function(req, res) {
     }
 
     // Create a new user 
-    var createUser = await User.create({
+    var createUser = await db.User.create({
         username: data.username,
         email: data.email,
         password: await argon2.hash(data.password)
@@ -69,7 +68,7 @@ router.post('/login', async function(req, res) {
     }
 
     // Search for the user in the User table
-    var user = await User.findOne({
+    var user = await db.User.findOne({
         where: {
             username: data.username
         }

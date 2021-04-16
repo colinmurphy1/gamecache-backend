@@ -1,6 +1,7 @@
 var api_response = require('../lib/response');
 
-var User = require('../models/User.js');
+// Load database
+var db = require('../database/db.js');
 
 async function auth(req, res, next) {
     // Get Authorization HTTP header
@@ -12,7 +13,7 @@ async function auth(req, res, next) {
     }
 
     // Grab token from DB
-    var user = await User.findOne({
+    var user = await db.User.findOne({
         where: {
             token: token
         }
@@ -33,6 +34,9 @@ async function auth(req, res, next) {
         return api_response(res, 401, "ExpiredTimestamp", "");
     }
 
+    // Pass authenticated user to the session
+    req.user = user;
+    
     next();
 }
 

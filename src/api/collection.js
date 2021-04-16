@@ -7,44 +7,18 @@ var getUserByToken = require('../lib/getUserByToken.js');
 var auth = require('../middleware/auth.js');
 
 // Load database
-var UserGame = require('../models/UserGame.js');
-var Game = require('../models/Game.js');
-var Device = require('../models/Device.js');
-var User = require('../models/User.js');
+var db = require('../database/db.js');
 
 var router = express.Router();
 
 // View your game collection
 router.get('/', auth, async function(req, res) {
-    const token = req.header('Authorization');
-
-    // Get user information from their authentication token
-    var getUserInfo = await getUserByToken(token);
-
-    // This should always work, but just to be safe, check for errors.
-    if (! getUserInfo) {
-        return api_response(res, 404, "UserNotFound", "");
-    }
-
     // Load list of games
-    var gameCollection = await UserGame.findAll({
-        where: {
-            UserId: getUserInfo.id
-        }
-    })
-    .then(function(model) {
-        return model;
-    })
-    .catch(function(error) {
-        console.log(error);
-        return false;
+    var games = await req.user.getGames({
+        include: [ {model: db.Device} ]
     });
 
-    if (! gameCollection) {
-        return api_response(res, 500, "GameLoadError", "");
-    }
-
-    return api_response(res, 200, "OK", gameCollection);
+    return api_response(res, 200, "OK", games);
 });
 
 
@@ -80,7 +54,7 @@ router.post('/', auth, async function(req, res) {
     }
 
     // Add game to database, using game and user ids
-    var addGame = await UserGame.create({
+    var addGame = await db.UserGame.create({
         UserId: getUserInfo.id,
         GameId: data.gameId,
         game_notes: data.notes,

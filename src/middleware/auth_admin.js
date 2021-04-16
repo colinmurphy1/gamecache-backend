@@ -1,6 +1,6 @@
 var api_response = require('../lib/response');
 
-var User = require('../models/User.js');
+var db = require('../database/db.js');
 
 async function auth_admin(req, res, next) {
     // Get Authorization HTTP header
@@ -12,7 +12,7 @@ async function auth_admin(req, res, next) {
     }
 
     // Grab token from DB
-    var user = await User.findOne({
+    var user = await db.User.findOne({
         where: {
             token: token
         }
