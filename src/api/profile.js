@@ -82,7 +82,7 @@ router.get('/:username', async function(req, res) {
 
     // Profiles will only be visible if the profile is public, or you are
     // viewing your own profile
-    myToken = req.header('Authorization');
+    const myToken = req.header('Authorization');
     if (! getUser.public_profile === true || ! myToken === getUser.token) {
         return api_response(res, 401, "NotAuthorized", {
             "message": `${username}'s profile is private`

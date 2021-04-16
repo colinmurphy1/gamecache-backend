@@ -12,6 +12,7 @@ var profile = require('./api/profile.js');
 var games = require('./api/games.js');
 var device = require('./api/device.js');
 var manufacturer = require('./api/manufacturer.js');
+var collection = require('./api/collection.js');
 
 
 // *****************************************************************************
@@ -46,6 +47,7 @@ app.use('/api/profile', profile);
 app.use('/api/games', games);
 app.use('/api/device', device);
 app.use('/api/manufacturer', manufacturer);
+app.use('/api/collection', collection);
 
 
 // *****************************************************************************
