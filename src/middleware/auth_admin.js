@@ -38,6 +38,9 @@ async function auth_admin(req, res, next) {
         return api_response(res, 403, "AccessDenied", "");
     }
 
+    // Pass authenticated user to the session
+    req.user = user;
+
     next();
 }
 
