@@ -116,7 +116,7 @@ router.post('/changepassword', auth, async function(req, res) {
     }
     
     // Search for the user in the User table
-    var user = await getUserByName(data.username);
+    var user = await getUserByName(req.user.username);
 
     // No user found
     if (! user) {
