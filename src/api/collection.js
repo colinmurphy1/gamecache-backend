@@ -3,7 +3,6 @@ var express = require('express');
 const Joi = require('joi');
 
 var api_response = require('../lib/response');
-var getUserByToken = require('../lib/getUserByToken.js');
 var auth = require('../middleware/auth.js');
 
 // Load database
@@ -22,10 +21,8 @@ router.get('/', auth, async function(req, res) {
 });
 
 
-
 // Add game to collection
 router.post('/', auth, async function(req, res) {
-    const token = req.header('Authorization');
     const data = req.body;
 
     // Validate user input
@@ -44,28 +41,18 @@ router.post('/', auth, async function(req, res) {
         return api_response(res, 400, "InputValidationError", value);
     }
 
-    // Retrieve current user from their authentication token
-    // TODO: Make a function that does this... I'm repeating myself a lot
-    var getUserInfo = await getUserByToken(token);
-
-    // This should always work, but just to be safe, check for errors.
-    if (! getUserInfo) {
-        return api_response(res, 404, "UserNotFound", "");
-    }
-
     // Add game to database, using game and user ids
     var addGame = await db.UserGame.create({
-        UserId: getUserInfo.id,
+        UserId: req.user.id,
         GameId: data.gameId,
-        game_notes: data.notes,
-        game_rating: data.rating
+        notes: data.notes,
+        rating: data.rating
     })
     .then(function(value) {
         //console.log(value);
-        return true;
+        return value;
     })
     .catch(function(error) {
-        console.log(error);
         return false;
     });
 
@@ -76,5 +63,108 @@ router.post('/', auth, async function(req, res) {
 
     return api_response(res, 200, "OK", data);
 });
+
+
+// Delete game from collection
+router.delete("/:gameid", auth, async function(req, res) {
+    const gameId = req.params['gameid'];
+
+    // Find game in the UserGame table
+    var findGame = await db.UserGame.findOne({
+        where: { id: gameId }
+    })
+    .then(function(model) {
+        return model;
+    })
+    .catch(function(error) {
+        console.log(error);
+        return false;
+    });
+
+    // Check if the game exists
+    if (! findGame) {
+        return api_response(res, 404, "GameNotFound", {
+            "message": "This game does not exist"
+        })
+    }
+
+    // Verify ownership of the game
+    if (findGame.UserId != req.user.id) {
+        return api_response(res, 403, "OwnershipError", {
+            "message": "This game does not belong to you"
+        })
+    }
+
+    // Remove the game from the table
+    findGame.destroy();
+
+    return api_response(res, 200, "OK", {
+        "message": `Removed game from collection`
+    });
+});
+
+// Change rating or notes
+router.put("/", auth, async function(req, res) {
+    const data = req.body;
+
+    // Verify inputs
+    const schema = Joi.object({
+        // Game ID
+        gameId: Joi.number().required(),
+        // Notes, optional.
+        notes: Joi.string().allow('').default('').optional(),
+        // 1-5 star rating system, optional.
+        rating: Joi.number().default(0).min(0).max(5).optional()
+    });
+
+    const {error, value} = schema.validate(data, {abortEarly: false});
+
+    if (error) {
+        return api_response(res, 400, "InputValidationError", value);
+    }
+
+    // Find game in the UserGame table
+    var findGame = await db.UserGame.findOne({
+        where: { id: data.gameId }
+    })
+    .then(function(model) {
+        return model;
+    })
+    .catch(function(error) {
+        console.log(error);
+        return false;
+    });
+
+    // Check if the game exists
+    if (! findGame) {
+        return api_response(res, 404, "GameNotFound", {
+            "message": "This game does not exist"
+        })
+    }
+
+    // Verify ownership of the game
+    if (findGame.UserId != req.user.id) {
+        return api_response(res, 403, "OwnershipError", {
+            "message": "This game does not belong to you"
+        })
+    }
+
+    // Check for changes
+    for (var key in data) {
+        // Skip game id
+        if (key == "gameId") { continue; }
+    
+        // Make any required changes based on the specified data
+        if (data[key] != findGame[key]) {
+            findGame[key] = data[key];
+        }
+    }
+
+    // Save changes
+    await findGame.save();
+
+    return api_response(res, 200, "OK", "");
+});
+
 
 module.exports = router;

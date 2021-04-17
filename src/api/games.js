@@ -36,6 +36,7 @@ router.get('/', async function(req, res) {
     var gameList = []
     for (var game in getGames) {
         gameList.push({
+            "id": getGames[game].id,
             "title": getGames[game].title,
             "publisher": getGames[game].publisher,
             "year": getGames[game].year,
@@ -75,7 +76,7 @@ router.post('/', auth, async function(req, res) {
         DeviceId: data.device
     })
     .then(function(value) {
-        return true;
+        return value;
     })
     .catch(function(error) {
         return false;
@@ -88,28 +89,17 @@ router.post('/', auth, async function(req, res) {
         });
     }
 
-    return api_response(res, 200, "OK", "");
+    return api_response(res, 200, "OK", newGame);
 });
 
 // Delete a game (Admin only)
-router.delete('/', auth_admin, async function(req, res) {
-    const data = req.body;
-
-    // Validate input
-    const schema = Joi.object({
-        id: Joi.number().required()
-    });
-
-    const {error, value} = schema.validate(data, {abortEarly: false});
-    
-    if (error) {
-        return api_response(res, 400, "InputValidationError", value);
-    }
+router.delete('/:gameid', auth_admin, async function(req, res) {
+    const gameId = req.params['gameid'];
 
     // Find game by ID
     var deleteGame = await db.Game.findOne({
         where: {
-            id: data.id
+            id: gameId
         }
     })
     .then(function(model) {
@@ -126,7 +116,10 @@ router.delete('/', auth_admin, async function(req, res) {
     // Delete it
     deleteGame.destroy();
 
-    return api_response(res, 200, "OK", "");
+    return api_response(res, 200, "OK", {
+        "message": `"${deleteGame.title}" has been removed from the games table`,
+        "gameId": deleteGame.id
+    });
 });
 
 

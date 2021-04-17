@@ -6,11 +6,12 @@ module.exports = (sequelize, DataTypes) => {
             autoIncrement: true
         },
         // Optional game notes
-        game_notes: {
+        notes: {
             type: DataTypes.STRING,
             allowNull: true
         },
-        game_rating: {
+        // Optional rating
+        rating: {
             type: DataTypes.INTEGER,
             defaultValue: 0,
             allowNull: true

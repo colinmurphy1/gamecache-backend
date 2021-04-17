@@ -36,7 +36,7 @@ router.post('/', auth_admin, async function(req, res) {
         name: data.name
     }).then(function(value) {
         // Manufacturer creation successful
-        return true;
+        return value;
     })
     .catch(function(error) {
         // Error encountered while creating device
@@ -51,7 +51,8 @@ router.post('/', auth_admin, async function(req, res) {
     }
 
     return api_response(res, 200, "OK", {
-        "message": `Added ${data.name} to manufacturer database.`
+        "message": `Added ${data.name} to manufacturer database.`,
+        "manufacturerId": createManufacturer.id
     });
 });
 

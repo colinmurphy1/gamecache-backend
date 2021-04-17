@@ -46,7 +46,7 @@ router.post('/', auth_admin, async function(req, res) {
         year: data.year
     }).then(function(value) {
         // Device creation successful
-        return true;
+        return value;
     })
     .catch(function(error) {
         // Error encountered while creating device
@@ -60,7 +60,8 @@ router.post('/', auth_admin, async function(req, res) {
     }
 
     return api_response(res, 200, "OK", {
-        "message": `Added ${data.name} to device database.`
+        "message": `Added ${data.name} to device database.`,
+        "deviceId": createDevice.id
     });
 });
 

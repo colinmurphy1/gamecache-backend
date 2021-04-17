@@ -42,11 +42,11 @@ router.post('/register', async function(req, res) {
         return false;
     });
 
-    if (createUser) {
-        return api_response(res, 200, "OK", "");
+    if (! createUser) {
+        return api_response(res, 400, "Error", "Could not create user");
     }
 
-    return api_response(res, 400, "Error", "Could not create user");
+    return api_response(res, 200, "OK", "");
 });
 
 
