@@ -4,6 +4,7 @@ var crypto = require('crypto');
 const Joi = require('joi');
 
 var api_response = require('../lib/response');
+var getUserByName = require('../lib/getUserByName.js');
 var auth = require('../middleware/auth.js');
 
 var db = require('../database/db.js');
@@ -69,17 +70,7 @@ router.post('/login', async function(req, res) {
     }
 
     // Search for the user in the User table
-    var user = await db.User.findOne({
-        where: {
-            username: data.username
-        }
-    }).then(function(model) {
-        return model;
-    })
-    .catch(function(error) {
-        //console.log(error);
-        return false;
-    });
+    var user = await getUserByName(data.username);
 
     // No user found
     if (! user) {
@@ -125,16 +116,7 @@ router.post('/changepassword', auth, async function(req, res) {
     }
     
     // Search for the user in the User table
-    var user = await db.User.findOne({
-        where: {
-            username: req.user.username
-        }
-    }).then(function(model) {
-        return model;
-    })
-    .catch(function(error) {
-        return false;
-    });
+    var user = await getUserByName(data.username);
 
     // No user found
     if (! user) {

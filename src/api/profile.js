@@ -3,6 +3,7 @@ const { Op } = require('sequelize');
 
 var api_response = require('../lib/response');
 var auth = require('../middleware/auth.js');
+var getUserByName = require('../lib/getUserByName.js');
 
 // Load database
 var db = require('../database/db.js');
@@ -62,17 +63,7 @@ router.get('/:username', async function(req, res) {
     const username = req.params['username'];
 
     // Find user
-    var getUser = await db.User.findOne({
-        where: {
-            username: username
-        }
-    })
-    .then(function(model) {
-        return model;
-    })
-    .catch(function(error) {
-        return false;
-    });
+    const getUser = await getUserByName(username);
 
     // Display a message if the user does not exist
     if (! getUser) {
