@@ -4,6 +4,7 @@ var crypto = require('crypto');
 const Joi = require('joi');
 
 var api_response = require('../lib/response');
+var auth = require('../middleware/auth.js');
 
 var db = require('../database/db.js');
 
@@ -103,6 +104,63 @@ router.post('/login', async function(req, res) {
     return api_response(res, 200, "OK", {
         token: user.token,
         token_expires_at: user.token_expires_at
+    });
+});
+
+
+/* Change password */
+router.post('/changepassword', auth, async function(req, res) {
+    const data = req.body;
+
+    // Validate user input
+    const schema = Joi.object({
+        password: Joi.string().min(8).required(),
+        new_password: Joi.string().min(8).required()
+    });
+
+    const {error, value} = schema.validate(data, {abortEarly: false});
+
+    if (error) {
+        return api_response(res, 400, "InputValidationError", value);
+    }
+    
+    // Search for the user in the User table
+    var user = await db.User.findOne({
+        where: {
+            username: req.user.username
+        }
+    }).then(function(model) {
+        return model;
+    })
+    .catch(function(error) {
+        return false;
+    });
+
+    // No user found
+    if (! user) {
+        return api_response(res, 404, "UserNotValid", "");
+    }
+
+    // Verify hash
+    var matches = await argon2.verify(user.password, data.password);
+
+    // Incorrect password
+    if (! matches) {
+        return api_response(res, 401, "Unauthorized", "");
+    }
+
+    // Generate a new password hash
+    user.password = await argon2.hash(data.new_password);
+
+    // Clear tokens, forcing logout
+    user.token = null;
+    user.token_expires_at = null;
+
+    // Save changes
+    user.save();
+
+    return api_response(res, 200, "OK", {
+        "message": "Password changed successfully"
     });
 });
 
