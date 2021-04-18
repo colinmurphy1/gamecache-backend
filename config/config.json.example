@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "root",
+    "password": "password",
+    "database": "gamecache-dev",
+    "host": "localhost",
+    "dialect": "mariadb"
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "gamecache-test",
+    "host": "127.0.0.1",
+    "dialect": "mariadb"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "gamecache-prod",
+    "host": "127.0.0.1",
+    "dialect": "mariadb"
+  }
+}

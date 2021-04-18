@@ -47,6 +47,6 @@ db.Game.belongsToMany(db.User, { through: "UserGame" });
 
 
 // Sync database models
-db.sequelize.sync({force:true});
+//db.sequelize.sync();
 
 module.exports = db;
