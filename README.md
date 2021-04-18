@@ -1,50 +1,43 @@
-# GameSite
+# Gamecache
 
-GameSite is a community website where you can keep track of your game
-collection. You can use it to keep track of which games you have completed, 
-rate your games, and share your collection with others, all in one place.
+Gamecache is a web service that keeps track of your video game collection. You
+can use Gamecache to rate your games, mark them as played or unplayed and more.
 
-## API Endpoints
+This Git repository is for the backend APIs for Gamecache.
 
-Documentation of the API will be created soon, however, for now here is a
-general overview of the API:
+## API Documentation
 
-```
-/api/auth           User authentication and registration endpoints
-/api/device         List, add, and remove devices (consoles)
-/api/games          List, add, and remove games
-/api/collection     List, add, and remove games to your collection
-/api/manufacturer   List, add, and remove device manufacturers
-/api/profile        List and view user profiles
-```
+The API documentation is available in the **doc/** folder.
 
 ## Installation
 
-**This is a work in progress*
+**This is a work in progress**
 
-GameSite requires `nodejs` for the backend APIs, and `nginx` to serve the
-frontend website files. A database server, such as `MariaDB` or `MySQL` is
-required. 
+Software requirements:
+
+* Node.js (development is done on v15.x)
+* Nginx
+* Database server (MariaDB or MySQL)
 
 
-1. Install the required dependencies
+1.  Install the required dependencies
+
+    `npm install`
 
 2. Create an `.env` file using the example located at `.env-example`.
 
 3. Create the database on mysql or mariadb, and configure the connection
 parameters in `.env`.
 
-3. **TODO:** Run migrations
+3. Run migrations
+
+    `npx sequelize-cli db:migrate`
 
 4. Start the backend API
 
-5. Create yourself a user account, and follow the instructions below.
+    `node src/index.js`
 
-**Note:** In order to perform some actions, such as deleting users, games, and
-devices, you will need to have an admin user configured. There is no provision
-to do this at this time, so it must be done manually.
+5. Create a user account with the `/api/auth/register` endpoint.
 
-To add an administrator account, use the mysql CLI or a GUI such as Sequel Ace
-(macOS) and set **admin** to **1** on your desired admin user.
-
-A script will be created to automate this task soon.
+6. Assign your user account as an administrator by changing `admin` to **1**
+in the database table `Users`.
