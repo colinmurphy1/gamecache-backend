@@ -26,8 +26,11 @@ Software requirements:
 
 2. Create an `.env` file using the example located at `.env-example`.
 
-3. Create the database on mysql or mariadb, and configure the connection
-parameters in `.env`.
+3. Create a `config.json` file in the `config/` directory using the example
+file, `config.json.example`.
+
+3. Create the database table on mysql or mariadb, and configure the connection
+parameters in `.env` and `config/config.json`
 
 3. Run migrations
 
@@ -36,6 +39,8 @@ parameters in `.env`.
 4. Start the backend API
 
     `node src/index.js`
+
+    The server will listen on http://localhost:3000 by default.
 
 5. Create a user account with the `/api/auth/register` endpoint.
 
