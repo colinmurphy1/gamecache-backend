@@ -11,7 +11,15 @@ var db = require('../database/db.js');
 
 var router = express.Router();
 
-// Game list
+/**
+ * @api {get} /api/game View all games
+ * @apiName View all game
+ * @apiGroup Game
+ * 
+ * @apiSuccess {Object} games The resulting list of games
+ * 
+ * @apiError GameLoadError Could not retrieve the list of games
+ */
 router.get('/', async function(req, res) {
 
     // Find all games and their associated console (device)
@@ -27,7 +35,7 @@ router.get('/', async function(req, res) {
     });
 
     if (! getGames) {
-        return api_response(res, 404, "BAD", {
+        return api_response(res, 404, "GameLoadError", {
             "message": "Could not retrieve games"
         });
     }
@@ -46,7 +54,9 @@ router.get('/', async function(req, res) {
     }
 
     // Show the clean JSON list
-    return api_response(res, 200, "OK", gameList);
+    return api_response(res, 200, "OK", {
+        "games": gameList
+    });
 });
 
 

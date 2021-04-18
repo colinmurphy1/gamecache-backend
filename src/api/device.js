@@ -11,15 +11,42 @@ var db = require('../database/db.js');
 var router = express.Router();
 
 
-// Device (console) list
+/**
+ * @api {get} /api/device View all devices
+ * @apiName View all devices
+ * @apiGroup Device
+ * 
+ * @apiSuccess {Object} devices The list of devices, including their
+ * ID, name, etc.
+ */
 router.get('/', async function(req, res) {
-    var consoles = await db.Device.findAll({
+    var devices = await db.Device.findAll({
         include: db.Manufacturer
     });
-    return api_response(res, 200, "OK", consoles);
+    return api_response(res, 200, "OK", {
+        "devices": devices
+    });
 });
 
-// Add device (this will be admin only)
+/**
+ * @api {post} /api/device Add a device
+ * @apiName Add a device
+ * @apiGroup Device
+ * @apiPermission admin
+ * 
+ * @apiHeader {String} Authorization Authorization token
+ * 
+ * @apiParam {Number} name Name of the device
+ * @apiParam {String=..10} shortname Short (<10 char) name of the device
+ * @apiParam {Number} manufacturer Manufacturer ID number
+ * 
+ * @apiSuccess {String} name Device name
+ * @apiSuccess {String} shortname Device shortname
+ * @apiSuccess {Number} id Device ID
+ * 
+ * @apiError InputValidationError The passed data is incorrect
+ * @apiError AddDeviceFailed Unable to add device to database
+ */
 router.post('/', auth_admin, async function(req, res) {
     const data = req.body;
 
@@ -60,8 +87,9 @@ router.post('/', auth_admin, async function(req, res) {
     }
 
     return api_response(res, 200, "OK", {
-        "message": `Added ${data.name} to device database.`,
-        "deviceId": createDevice.id
+        "id": createDevice.id,
+        "name": data.name,
+        "shortname": data.shortname
     });
 });
 

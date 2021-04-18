@@ -11,7 +11,22 @@ var db = require('../database/db.js');
 
 var router = express.Router();
 
-/* User registration */
+/**
+ * @api {post} /api/auth/register Create a user account
+ * @apiName Register
+ * @apiGroup Authentication
+ * @apiDescription Create a new user account 
+ *
+ * @apiParam {String} username Username for the user account
+ * @apiParam {String} email Email for the user account
+ * @apiParam {string{8+}} password Password for the user account. Must be a minimum of
+ * 8 characters.
+ *
+ * @apiSuccess {String} message User created successfully.
+ * 
+ * @apiError UserCreationError Could not create the user account, likely due
+ * to the username being claimed.
+ */
 router.post('/register', async function(req, res) {
     // {"username": "username-here", "email": "email-here", "password": "password-here"}
     const data = req.body;
@@ -45,14 +60,31 @@ router.post('/register', async function(req, res) {
     });
 
     if (! createUser) {
-        return api_response(res, 400, "Error", "Could not create user");
+        return api_response(res, 400, "UserCreationError", []);
     }
 
-    return api_response(res, 200, "OK", "");
+    return api_response(res, 200, "OK", {
+        "message": "User created successfully."
+    });
 });
 
 
-/* User Login */
+/**
+ * @api {post} /api/auth/login Log in
+ * @apiName Login
+ * @apiGroup Authentication
+ *
+ * @apiParam {String} username Username for the user account
+ * @apiParam {String} password Password for the user account.
+ *
+ * @apiSuccess {String} token A hexidecimal token
+ * @apiSuccess {String} token_expires_at The time in which the token will
+ * expire, which is one hour from the time of login.
+ *
+ * @apiError InputVaidationError The username and password do not meet the
+ * required criteria.
+ * @apiError Unauthorized Incorrect username or password specified.
+ */
 router.post('/login', async function(req, res) {
     // {"username": "Username-Here", "password": "Password-Here"}
     const data = req.body;
@@ -74,14 +106,14 @@ router.post('/login', async function(req, res) {
 
     // No user found
     if (! user) {
-        return api_response(res, 404, "UserNotValid", "");
+        return api_response(res, 401, "Unauthorized", []);
     }
 
     // Verify hash
     var matches = await argon2.verify(user.password, data.password);
     
     if (! matches) {
-        return api_response(res, 401, "Unauthorized", "");
+        return api_response(res, 401, "Unauthorized", []);
     }
 
     // Generate a new random token, and set the expiration time to 1 hour from now.
@@ -99,8 +131,21 @@ router.post('/login', async function(req, res) {
 });
 
 
-/* Change password */
-router.post('/changepassword', auth, async function(req, res) {
+/**
+ * @api {put} /api/auth/changepassword Change password
+ * @apiName Change password
+ * @apiGroup Authentication
+ * @apiHeader {String} Authorization Authorization token
+ *
+ * @apiParam {String} password Old password
+ * @apiParam {string} new_password New password
+ *
+ * @apiSuccess {String} message Password changed successfully
+ * 
+ * @apiError InputValidationError The data input did not match the requirements.
+ * @apiError Unauthorized Incorrect username or password.
+ */
+router.put('/changepassword', auth, async function(req, res) {
     const data = req.body;
 
     // Validate user input
@@ -120,7 +165,7 @@ router.post('/changepassword', auth, async function(req, res) {
 
     // No user found
     if (! user) {
-        return api_response(res, 404, "UserNotValid", "");
+        return api_response(res, 401, "Unauthorized", "");
     }
 
     // Verify hash

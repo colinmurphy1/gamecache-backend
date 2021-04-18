@@ -10,18 +10,46 @@ var db = require('../database/db.js');
 
 var router = express.Router();
 
-// View your game collection
+/**
+ * @api {get} /api/collection View collection
+ * @apiName View Collection
+ * @apiGroup Collection
+ * @apiDescription Returns the game collection of the logged in user.
+ * 
+ * @apiHeader {String} Authorization Authorization token
+ * 
+ * @apiSuccess {Object} games A list of games in your collection.
+ */
 router.get('/', auth, async function(req, res) {
     // Load list of games
     var games = await req.user.getGames({
         include: [ {model: db.Device} ]
     });
 
-    return api_response(res, 200, "OK", games);
+    return api_response(res, 200, "OK", {
+        "games": games
+    });
 });
 
 
-// Add game to collection
+/**
+ * @api {post} /api/collection Add a game to your collection
+ * @apiName Add to collection
+ * @apiGroup Collection
+ * @apiHeader {String} Authorization Authorization token
+ * 
+ * @apiParam {Number} gameId ID of the game to add to your collection
+ * (see Games API)
+ * @apiParam {String} [notes] Specific notes to add to the game
+ * @apiParam {Number=0-5} [rating] Rating from 1-5 stars, with 0 being unrated.
+ * 
+ * @apiSuccess {String} name Name of the game
+ * @apiSuccess {Number} gameId New ID number of the game
+ * 
+ * @apiError InputValidationError The data input did not match the requirements.
+ * @apiError AddGameError The game could not be added because it does not
+ * exist, or already exists in the database.
+ */
 router.post('/', auth, async function(req, res) {
     const data = req.body;
 
@@ -38,7 +66,7 @@ router.post('/', auth, async function(req, res) {
     const {error, value} = schema.validate(data, {abortEarly: false});
 
     if (error) {
-        return api_response(res, 400, "InputValidationError", value);
+        return api_response(res, 400, "InputValidationError", []);
     }
 
     // Add game to database, using game and user ids
@@ -58,14 +86,26 @@ router.post('/', auth, async function(req, res) {
 
     // Something went wrong adding the game
     if (! addGame) {
-        return api_response(res, 500, "AddGameError", "");
+        return api_response(res, 500, "AddGameError", []);
     }
 
-    return api_response(res, 200, "OK", data);
+    return api_response(res, 200, "OK", []);
 });
 
 
-// Delete game from collection
+/**
+ * @api {delete} /api/collection/:gameId Remove a game from your collection
+ * @apiName Remove from collection
+ * @apiGroup Collection
+ * @apiHeader {String} Authorization Authorization token
+ * 
+ * @apiParam {Number} gameId ID of the game to remove from your collection
+ * 
+ * @apiSuccess {String} message Game removed from your collection
+ * 
+ * @apiError GameNotFound The game does not exist in your collection
+ * @apiError AccessDenied The game does not belong to you
+ */
 router.delete("/:gameid", auth, async function(req, res) {
     const gameId = req.params['gameid'];
 
@@ -90,7 +130,7 @@ router.delete("/:gameid", auth, async function(req, res) {
 
     // Verify ownership of the game
     if (findGame.UserId != req.user.id) {
-        return api_response(res, 403, "OwnershipError", {
+        return api_response(res, 403, "AccessDenied", {
             "message": "This game does not belong to you"
         })
     }
@@ -103,7 +143,22 @@ router.delete("/:gameid", auth, async function(req, res) {
     });
 });
 
-// Change rating or notes
+/**
+ * @api {put} /api/collection Change information about a game in your collection
+ * @apiName Change information about a game in your collection
+ * @apiGroup Collection
+ * @apiHeader {String} Authorization Authorization token
+ * 
+ * @apiParam {Number} gameId ID of the game in your collection
+ * @apiParam {String} [notes] Specific notes to add to the game
+ * @apiParam {Number=0-5} [rating] Rating from 1-5 stars, with 0 being unrated.
+ * 
+ * @apiSuccess {String} message Game removed from your collection
+ * 
+ * @apiError InputValidationError The passed data is incorrect
+ * @apiError GameNotFound The game does not exist in your collection
+ * @apiError AccessDenied The game does not belong to you
+ */
 router.put("/", auth, async function(req, res) {
     const data = req.body;
 
@@ -144,7 +199,7 @@ router.put("/", auth, async function(req, res) {
 
     // Verify ownership of the game
     if (findGame.UserId != req.user.id) {
-        return api_response(res, 403, "OwnershipError", {
+        return api_response(res, 403, "AccessDenied", {
             "message": "This game does not belong to you"
         })
     }
@@ -163,7 +218,7 @@ router.put("/", auth, async function(req, res) {
     // Save changes
     await findGame.save();
 
-    return api_response(res, 200, "OK", "");
+    return api_response(res, 200, "OK", []);
 });
 
 
