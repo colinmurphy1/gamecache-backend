@@ -2,6 +2,7 @@
 require('dotenv').config();
 const express = require('express');
 const rateLimit = require("express-rate-limit");
+const cors = require('cors');
 
 // lib
 var api_response = require('./lib/response.js');
@@ -31,6 +32,9 @@ const apiLimiter = rateLimit({
     max: 200
 });
 app.use("/api/", apiLimiter);
+
+// Enable CORS for frontend API access
+app.use(cors());
 
 
 // *****************************************************************************

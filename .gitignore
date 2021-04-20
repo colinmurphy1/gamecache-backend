@@ -8,3 +8,6 @@ node_modules
 
 # just for now
 docs/
+
+# sequelize migration config
+config/config.json
