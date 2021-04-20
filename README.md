@@ -15,7 +15,7 @@ The API documentation is available in the **doc/** folder.
 
 Software requirements:
 
-* Node.js (development is done on v15.x)
+* Node.js ^15.x
 * Nginx
 * Database server (MariaDB or MySQL)
 
@@ -29,20 +29,20 @@ Software requirements:
 3. Create a `config.json` file in the `config/` directory using the example
 file, `config.json.example`.
 
-3. Create the database table on mysql or mariadb, and configure the connection
+4. Create the database table on mysql or mariadb, and configure the connection
 parameters in `.env` and `config/config.json`
 
-3. Run migrations
+5. Run migrations
 
     `npx sequelize-cli db:migrate`
 
-4. Start the backend API
+6. Start the backend API
 
     `node src/index.js`
 
     The server will listen on http://localhost:3000 by default.
 
-5. Create a user account with the `/api/auth/register` endpoint.
+7. Create a user account with the `/api/auth/register` endpoint.
 
-6. Assign your user account as an administrator by changing `admin` to **1**
+8. Assign your user account as an administrator by changing `admin` to **1**
 in the database table `Users`.
