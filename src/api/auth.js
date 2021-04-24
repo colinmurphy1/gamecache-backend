@@ -22,13 +22,12 @@ var router = express.Router();
  * @apiParam {string{8+}} password Password for the user account. Must be a minimum of
  * 8 characters.
  *
- * @apiSuccess {String} message User created successfully.
+ * @apiSuccess {String} username Username of the new user account
  * 
  * @apiError UserCreationError Could not create the user account, likely due
  * to the username being claimed.
  */
 router.post('/register', async function(req, res) {
-    // {"username": "username-here", "email": "email-here", "password": "password-here"}
     const data = req.body;
 
     // Validate user input
@@ -64,7 +63,7 @@ router.post('/register', async function(req, res) {
     }
 
     return api_response(res, 200, "OK", {
-        "message": "User created successfully."
+        "username": data.username
     });
 });
 
@@ -123,8 +122,9 @@ router.post('/login', async function(req, res) {
     // Save this to the database 
     await user.save();
 
-    // User logged in, give token and token expiration time
+    // User logged in. Return username, auth token, and token expiration time
     return api_response(res, 200, "OK", {
+        username: user.username,
         token: user.token,
         token_expires_at: user.token_expires_at
     });
@@ -143,7 +143,7 @@ router.post('/login', async function(req, res) {
  * @apiSuccess {String} message Password changed successfully
  * 
  * @apiError InputValidationError The data input did not match the requirements.
- * @apiError Unauthorized Incorrect username or password.
+ * @apiError Unauthorized Incorrect password.
  */
 router.put('/changepassword', auth, async function(req, res) {
     const data = req.body;

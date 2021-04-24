@@ -41,7 +41,7 @@ router.get('/', async function(req, res) {
     }
 
     // Build a list of games in some cleaner JSON
-    var gameList = []
+    var gameList = [];
     for (var game in getGames) {
         gameList.push({
             "id": getGames[game].id,
