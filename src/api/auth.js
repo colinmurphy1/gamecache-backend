@@ -192,4 +192,24 @@ router.put('/changepassword', auth, async function(req, res) {
 });
 
 
+/**
+ * @api {post} /api/auth/logout Log out
+ * @apiName Log out
+ * @apiGroup Authentication
+ * @apiHeader {String} Authorization Authorization token
+ */
+router.post('/logout', auth, async function(req, res) {
+    // Get user 
+    var user = await getUserByName(req.user.username);
+
+    // Clear the token
+    user.token = null;
+    user.token_expires_at = null;
+
+    // Save changes
+    user.save();
+
+    return api_response(res, 200, "OK", []);
+});
+
 module.exports = router;
