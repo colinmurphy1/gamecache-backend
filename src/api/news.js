@@ -10,7 +10,20 @@ var db = require('../database/db.js');
 
 var router = express.Router();
 
-// Post news article (requires admin)
+/**
+ * @api {post} /api/news Post news article
+ * @apiName New article
+ * @apiGroup News
+ * @apiHeader {String} Authorization Authorization token
+ * @apiPermission admin
+ * 
+ * @apiParam {String} title Title of the news article
+ * @apiParam {String} content Content of the post. Can be in plain text or
+ * markdown.
+ * 
+ * @apiError InputValidationError Incorrect data passed
+ * @apiError CreationError Could not create post
+ */
 router.post('/', auth_admin, async function(req, res) {
     const data = req.body;
 
@@ -46,7 +59,13 @@ router.post('/', auth_admin, async function(req, res) {
 });
 
 
-// Get news articles
+/**
+ * @api {get} /api/news Get news articles
+ * @apiName New article
+ * @apiGroup News
+ * 
+ * @apiError RetrievalError Could not load any posts
+ */
 router.get('/', async function(req, res) {
 
     const newsPosts = await db.NewsPost.findAll({
@@ -62,7 +81,7 @@ router.get('/', async function(req, res) {
     });
 
     if (! newsPosts) {
-        return api_response(res, 200, "ERR", "Could not load posts");
+        return api_response(res, 200, "RetrievalError", "Could not load posts");
     }
 
     return api_response(res, 200, "OK", newsPosts);

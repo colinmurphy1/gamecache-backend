@@ -1,6 +1,6 @@
 [
   {
-    "type": "post",
+    "type": "put",
     "url": "/api/auth/changepassword",
     "title": "Change password",
     "name": "Change_password",
@@ -64,7 +64,30 @@
             "group": "Error 4xx",
             "optional": false,
             "field": "Unauthorized",
-            "description": "<p>Incorrect username or password.</p>"
+            "description": "<p>Incorrect password.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "src/api/auth.js",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
+    "url": "/api/auth/logout",
+    "title": "Log out",
+    "name": "Log_out",
+    "group": "Authentication",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>Authorization token</p>"
           }
         ]
       }
@@ -183,8 +206,8 @@
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "message",
-            "description": "<p>User created successfully.</p>"
+            "field": "username",
+            "description": "<p>Username of the new user account</p>"
           }
         ]
       }
@@ -650,5 +673,93 @@
     "version": "0.0.0",
     "filename": "src/api/games.js",
     "groupTitle": "Game"
+  },
+  {
+    "type": "post",
+    "url": "/api/news",
+    "title": "Post news article",
+    "name": "New_article",
+    "group": "News",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>Authorization token</p>"
+          }
+        ]
+      }
+    },
+    "permission": [
+      {
+        "name": "admin"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "title",
+            "description": "<p>Title of the news article</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "content",
+            "description": "<p>Content of the post. Can be in plain text or markdown.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "InputValidationError",
+            "description": "<p>Incorrect data passed</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "CreationError",
+            "description": "<p>Could not create post</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "src/api/news.js",
+    "groupTitle": "News"
+  },
+  {
+    "type": "get",
+    "url": "/api/news",
+    "title": "Get news articles",
+    "name": "New_article",
+    "group": "News",
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "RetrievalError",
+            "description": "<p>Could not load any posts</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "src/api/news.js",
+    "groupTitle": "News"
   }
 ]
