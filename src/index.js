@@ -14,6 +14,7 @@ var games = require('./api/games.js');
 var device = require('./api/device.js');
 var manufacturer = require('./api/manufacturer.js');
 var collection = require('./api/collection.js');
+var news = require('./api/news.js');
 
 
 // *****************************************************************************
@@ -52,10 +53,11 @@ app.use('/api/games', games);
 app.use('/api/device', device);
 app.use('/api/manufacturer', manufacturer);
 app.use('/api/collection', collection);
+app.use('/api/news', news);
 
 
 // *****************************************************************************
-// Start the express server on port 3000
+// Start the express server
 
 app.listen(process.env.APP_PORT, () => {
     console.log("Server is running on port", process.env.APP_PORT);

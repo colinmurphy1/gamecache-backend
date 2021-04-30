@@ -27,6 +27,7 @@ db.Manufacturer = require('../models/Manufacturer')(sequelize, Sequelize);
 db.Device = require('../models/Device')(sequelize, Sequelize);
 db.Game = require('../models/Game')(sequelize, Sequelize);
 db.UserGame = require('../models/UserGame')(sequelize, Sequelize);
+db.NewsPost = require('../models/NewsPost')(sequelize, Sequelize);
 
 
 /*
@@ -45,6 +46,9 @@ db.Game.belongsTo(db.Device);
 db.User.belongsToMany(db.Game, { through: "UserGame" });
 db.Game.belongsToMany(db.User, { through: "UserGame" });
 
+// A user has many news posts, but a news post belongs to one user
+db.User.hasMany(db.NewsPost);
+db.NewsPost.belongsTo(db.User);
 
 // Sync database models
 //db.sequelize.sync();
