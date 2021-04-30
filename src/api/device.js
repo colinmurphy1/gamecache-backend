@@ -21,11 +21,15 @@ var router = express.Router();
  */
 router.get('/', async function(req, res) {
     var devices = await db.Device.findAll({
-        include: db.Manufacturer
+        include: {
+            model: db.Manufacturer,
+            attributes: ['id', 'name']
+        },
+        attributes: {
+            exclude: ['ManufacturerId']
+        }
     });
-    return api_response(res, 200, "OK", {
-        "devices": devices
-    });
+    return api_response(res, 200, "OK", devices);
 });
 
 /**

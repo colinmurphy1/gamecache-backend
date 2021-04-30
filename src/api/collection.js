@@ -23,11 +23,32 @@ var router = express.Router();
 router.get('/', auth, async function(req, res) {
     // Load list of games
     var games = await req.user.getGames({
-        include: [ {model: db.Device} ]
+        include: [
+            {
+                model: db.Device
+            }
+        ]
     });
 
+    // Create a cleaner games list
+    var gamesList = [];
+    for (const game in games) {
+        gamesList.push({
+            'id': games[game].UserGame.id,
+            'gameId': games[game].id,
+            'title': games[game].title,
+            'publisher': games[game].publisher,
+            'year': games[game].year,
+            'rating': games[game].UserGame.rating,
+            'notes': games[game].UserGame.notes,
+            'deviceId': games[game].Device.id,
+            'deviceName': games[game].Device.name,
+            'deviceShortname': games[game].Device.shortname
+        });
+    }
+
     return api_response(res, 200, "OK", {
-        "games": games
+        "games": gamesList
     });
 });
 

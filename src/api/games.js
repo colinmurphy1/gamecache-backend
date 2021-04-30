@@ -24,7 +24,13 @@ router.get('/', async function(req, res) {
 
     // Find all games and their associated console (device)
     var getGames = await db.Game.findAll({
-        include: db.Device
+        include: {
+            model: db.Device,
+            attributes: ['id', 'name', 'shortname']
+        },
+        attributes: {
+            exclude: ['DeviceId', 'createdAt', 'updatedAt']
+        }
     })
     .then(function(model) {
         return model;
@@ -40,22 +46,9 @@ router.get('/', async function(req, res) {
         });
     }
 
-    // Build a list of games in some cleaner JSON
-    var gameList = [];
-    for (var game in getGames) {
-        gameList.push({
-            "id": getGames[game].id,
-            "title": getGames[game].title,
-            "publisher": getGames[game].publisher,
-            "year": getGames[game].year,
-            "device": getGames[game]["Device"].name,
-            "device_short": getGames[game]["Device"].shortname
-        });
-    }
-
     // Show the clean JSON list
     return api_response(res, 200, "OK", {
-        "games": gameList
+        "games": getGames
     });
 });
 

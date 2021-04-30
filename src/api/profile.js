@@ -26,6 +26,12 @@ router.get('/all', async function(req, res) {
                 {public_profile: true},
                 {token: myToken}
             ]
+        },
+        attributes: {
+            exclude: [
+                'email', 'password', 'public_profile', 'token',
+                'token_expires_at', 'bio', 'updatedAt', 'admin'
+            ]
         }
     })
     .then(function(model) {
@@ -41,19 +47,7 @@ router.get('/all', async function(req, res) {
         });
     }
 
-    // Create a new list of users
-    // NOTE: More information may be displayed here in the future, such
-    // as profile pictures, etc.
-    var usersList = [];
-
-    for (var user in getUsers) {
-        usersList.push({
-            "id": getUsers[user].id,
-            "username": getUsers[user].username
-        });
-    }
-
-    return api_response(res, 200, "OK", usersList);
+    return api_response(res, 200, "OK", getUsers);
 
 });
 
