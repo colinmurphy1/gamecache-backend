@@ -1,6 +1,9 @@
 // Load modules
 var express = require('express');
 const Joi = require('joi');
+// Csv
+const { writeToString } = require('@fast-csv/format');
+
 
 var api_response = require('../lib/response');
 var auth = require('../middleware/auth.js');
@@ -252,5 +255,56 @@ router.put("/", auth, async function(req, res) {
     return api_response(res, 200, "OK", []);
 });
 
+
+/**
+ * @api {get} /api/collection/csv Export collection as CSV
+ * @apiName Export collection
+ * @apiGroup Collection
+ * @apiDescription Exports a users' game collection as CSV 
+ * 
+ * @apiHeader {String} Authorization Authorization token
+ */
+router.get('/csv', auth, async function (req, res) {
+
+    // Load list of games
+    var games = await req.user.getGames({
+        include: [
+            {
+                model: db.Device
+            }
+        ]
+    });
+
+    // Create a list 
+    var gamesList = [
+        [
+            'id', 'gameid', 'title', 'publisher', 'year', 'rating', 'status',
+            'notes', 'deviceId', 'deviceName', 'deviceShortname'
+        ]
+    ];
+    for (const game in games) {
+        gamesList.push([
+            games[game].UserGame.id,
+            games[game].id,
+            games[game].title,
+            games[game].publisher,
+            games[game].year,
+            games[game].UserGame.rating,
+            games[game].UserGame.status,
+            games[game].UserGame.notes,
+            games[game].Device.id,
+            games[game].Device.name,
+            games[game].Device.shortname
+        ]);
+    }
+
+    // Create CSV data
+    const csvData = await writeToString(gamesList).then(data => data);
+
+    // Send CSV output
+    res.setHeader('Content-Type', 'text/csv');
+    res.status(200);
+    res.send(csvData.toString());
+});
 
 module.exports = router;
