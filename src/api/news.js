@@ -72,6 +72,9 @@ router.get('/', async function(req, res) {
         include: {
             model: db.User,
             attributes: ['id', 'username']
+        },
+        attributes: {
+            exclude: ['UserId']
         }
     })
     .then((model) => model)

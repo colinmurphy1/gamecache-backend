@@ -47,9 +47,7 @@ router.get('/', auth, async function(req, res) {
         });
     }
 
-    return api_response(res, 200, "OK", {
-        "games": gamesList
-    });
+    return api_response(res, 200, "OK", gamesList);
 });
 
 
