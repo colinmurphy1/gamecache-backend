@@ -40,6 +40,7 @@ router.get('/', auth, async function(req, res) {
             'publisher': games[game].publisher,
             'year': games[game].year,
             'rating': games[game].UserGame.rating,
+            'status': games[game].UserGame.status,
             'notes': games[game].UserGame.notes,
             'deviceId': games[game].Device.id,
             'deviceName': games[game].Device.name,
@@ -76,10 +77,15 @@ router.post('/', auth, async function(req, res) {
     const schema = Joi.object({
         // Game ID
         gameId: Joi.number().required(),
+
         // Notes, optional.
         notes: Joi.string().allow('').optional(),
+
         // 1-5 star rating system, optional.
-        rating: Joi.number().default(0).min(0).max(5).optional()
+        rating: Joi.number().default(0).min(0).max(5).optional(),
+
+        // Status
+        status: Joi.number().default(0).min(0).max(3).optional()
     });
 
     const {error, value} = schema.validate(data, {abortEarly: false});
@@ -93,7 +99,8 @@ router.post('/', auth, async function(req, res) {
         UserId: req.user.id,
         GameId: data.gameId,
         notes: data.notes,
-        rating: data.rating
+        rating: data.rating,
+        status: data.status
     })
     .then(function(value) {
         //console.log(value);
@@ -185,10 +192,15 @@ router.put("/", auth, async function(req, res) {
     const schema = Joi.object({
         // Game ID
         gameId: Joi.number().required(),
+        
         // Notes, optional.
         notes: Joi.string().allow('').default('').optional(),
+
         // 1-5 star rating system, optional.
-        rating: Joi.number().default(0).min(0).max(5).optional()
+        rating: Joi.number().default(0).min(0).max(5).optional(),
+
+        // Status
+        status: Joi.number().default(0).min(0).max(3).optional()
     });
 
     const {error, value} = schema.validate(data, {abortEarly: false});
