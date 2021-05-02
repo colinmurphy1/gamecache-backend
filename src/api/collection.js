@@ -10,6 +10,7 @@ var auth = require('../middleware/auth.js');
 
 // Load database
 var db = require('../database/db.js');
+const getUserByName = require('../lib/getUserByName');
 
 var router = express.Router();
 
@@ -21,11 +22,30 @@ var router = express.Router();
  * 
  * @apiHeader {String} Authorization Authorization token
  * 
+ * @apiError UserNotFound The specified user account does not exist
+ * 
  * @apiSuccess {Object} games A list of games in your collection.
  */
-router.get('/', auth, async function(req, res) {
+router.get('/user/:username', async function(req, res) {
+    const username = req.params['username'];
+    const token = req.header('Authorization');
+
+    // Get user
+    const user = await getUserByName(username);
+ 
+    // user does not exist
+    if (! user) {
+        return api_response(res, 404, "UserNotFound", []);
+    }
+
+    // Only permit the collection to be viewed if a) you are viewing your
+    // profile, or b) the users' profile is public
+    if (user.public_profile === false && user.token != token) {
+        return api_response(res, 401, "NotAuthorized", []);
+    }
+
     // Load list of games
-    var games = await req.user.getGames({
+    var games = await user.getGames({
         include: [
             {
                 model: db.Device
@@ -264,10 +284,30 @@ router.put("/", auth, async function(req, res) {
  * 
  * @apiHeader {String} Authorization Authorization token
  */
-router.get('/csv', auth, async function (req, res) {
+router.get('/user/:username/csv', async function (req, res) {
+
+    // Status messages
+    const statusTypes = ['Unplayed', 'InProgress', 'Completed', 'WontFinish'];
+
+    const username = req.params['username'];
+    const token = req.header('Authorization');
+
+    // Get user
+    const user = await getUserByName(username);
+ 
+    // user does not exist
+    if (! user) {
+        return api_response(res, 404, "UserNotFound", []);
+    }
+
+    // Only permit the collection to be viewed if a) you are viewing your
+    // profile, or b) the users' profile is public
+    if (user.public_profile === false && user.token != token) {
+        return api_response(res, 401, "NotAuthorized", []);
+    }
 
     // Load list of games
-    var games = await req.user.getGames({
+    var games = await user.getGames({
         include: [
             {
                 model: db.Device
@@ -275,7 +315,7 @@ router.get('/csv', auth, async function (req, res) {
         ]
     });
 
-    // Create a list 
+    // Create an array to store the CSV data. Line 1 is the header 
     var gamesList = [
         [
             'id', 'gameid', 'title', 'publisher', 'year', 'rating', 'status',
@@ -290,7 +330,7 @@ router.get('/csv', auth, async function (req, res) {
             games[game].publisher,
             games[game].year,
             games[game].UserGame.rating,
-            games[game].UserGame.status,
+            statusTypes[games[game].UserGame.status],
             games[game].UserGame.notes,
             games[game].Device.id,
             games[game].Device.name,

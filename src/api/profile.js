@@ -42,9 +42,7 @@ router.get('/all', async function(req, res) {
     });
 
     if (! getUsers) {
-        return api_response(res, 500, "UserLoadError", {
-            "message": "Could not load users"
-        });
+        return api_response(res, 500, "UserLoadError", []);
     }
 
     return api_response(res, 200, "OK", getUsers);
@@ -53,7 +51,7 @@ router.get('/all', async function(req, res) {
 
 
 /* Individual user profile */
-router.get('/:username', async function(req, res) {
+router.get('/user/:username', async function(req, res) {
     const username = req.params['username'];
 
     // Find user
@@ -61,18 +59,14 @@ router.get('/:username', async function(req, res) {
 
     // Display a message if the user does not exist
     if (! getUser) {
-        return api_response(res, 404, "UserNotFound", {
-            "message": `${username} does not exist`
-        });
+        return api_response(res, 404, "UserNotFound", []);
     }
 
     // Profiles will only be visible if the profile is public, or you are
     // viewing your own profile
     const myToken = req.header('Authorization');
-    if (! getUser.public_profile === true || ! myToken === getUser.token) {
-        return api_response(res, 401, "NotAuthorized", {
-            "message": `${username}'s profile is private`
-        });
+    if (getUser.public_profile === false && getUser.token != myToken) {
+        return api_response(res, 401, "NotAuthorized", []);
     }
 
     // Return profile

@@ -12,7 +12,7 @@ var db = require('../database/db.js');
 var router = express.Router();
 
 /**
- * @api {get} /api/game View all games
+ * @api {get} /api/games View all games
  * @apiName View all game
  * @apiGroup Game
  * 

@@ -61,7 +61,7 @@ router.post('/', auth_admin, async function(req, res) {
 
 /**
  * @api {get} /api/news Get news articles
- * @apiName New article
+ * @apiName Get Articles
  * @apiGroup News
  * 
  * @apiError RetrievalError Could not load any posts
