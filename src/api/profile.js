@@ -10,11 +10,17 @@ var db = require('../database/db.js');
 
 var router = express.Router();
 
-// You must be logged in to see profiles
-router.use(auth);
-
-
-/* List all users */
+/**
+ * @api {get} /api/profile/all View all public profiles on Gamecache
+ * @apiName All public users
+ * @apiGroup Profile
+ * @apiDescription Displays a list of all users (including yourself, if
+ * logged in) on Gamecache
+ * 
+ * @apiHeader {String} Authorization Authorization token (If logged in)
+ * 
+ * @apiError UserLoadError Could not load the list of users
+ */
 router.get('/all', async function(req, res) {
     const myToken = req.header('Authorization');
     
@@ -50,7 +56,18 @@ router.get('/all', async function(req, res) {
 });
 
 
-/* Individual user profile */
+/**
+ * @api {get} /api/profile/user/:username View a users profile 
+ * @apiName View profile
+ * @apiGroup Profile
+ * @apiDescription Displays a public user's profile if it is public, or your
+ * profile.
+ * 
+ * @apiHeader {String} Authorization Authorization token (If logged in)
+ * 
+ * @apiError UserNotFound The specified user does not exist
+ * @apiError NotAuthorized This user does not have a public profile
+ */
 router.get('/user/:username', async function(req, res) {
     const username = req.params['username'];
 
