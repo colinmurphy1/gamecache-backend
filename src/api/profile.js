@@ -30,7 +30,8 @@ router.get('/all', async function(req, res) {
         where: {
             [Op.or]: [
                 {public_profile: true},
-                {token: myToken}
+                // If there's no token specified, don't use it in the query
+                myToken ? {token: myToken} : {}
             ]
         },
         attributes: {
@@ -44,6 +45,7 @@ router.get('/all', async function(req, res) {
         return model;
     })
     .catch(function(error) {
+        console.log(error);
         return false
     });
 
