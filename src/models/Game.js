@@ -2,8 +2,7 @@ module.exports = (sequelize, DataTypes) => {
     return sequelize.define('Game', {
         title: {
             type: DataTypes.STRING,
-            allowNull: false,
-            unique: true
+            allowNull: false
         },
         publisher: {
             type: DataTypes.STRING,
