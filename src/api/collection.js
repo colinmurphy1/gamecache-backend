@@ -15,7 +15,83 @@ const getUserByName = require('../lib/getUserByName');
 var router = express.Router();
 
 /**
- * @api {get} /api/collection/user/:username View collection
+ * @api {get} /api/collection/:username.csv Export collection as CSV
+ * @apiName Export collection
+ * @apiGroup Collection
+ * @apiDescription Exports a users' game collection as CSV 
+ * 
+ * @apiHeader {String} Authorization Authorization token (If logged in)
+ * @apiParam {String} username The username of the user you want to view
+ * 
+ * @apiError UserNotFound The specified user account does not exist
+ * @apiError NotAuthorized This users' collection is private
+ */
+ router.get('/user/:username.csv', async function (req, res) {
+
+    // Status messages
+    const statusTypes = ['Unplayed', 'InProgress', 'Completed', 'WontFinish'];
+
+    const username = req.params['username'];
+    const token = req.header('Authorization');
+
+    // Get user
+    const user = await getUserByName(username);
+ 
+    // user does not exist
+    if (! user) {
+        return api_response(res, 404, "UserNotFound", []);
+    }
+
+    // Only permit the collection to be viewed if a) you are viewing your
+    // profile, or b) the users' profile is public
+    if (user.public_profile === false && user.token != token) {
+        return api_response(res, 401, "NotAuthorized", []);
+    }
+
+    // Load list of games
+    var games = await user.getGames({
+        include: [
+            {
+                model: db.Device
+            }
+        ]
+    });
+
+    // Create an array to store the CSV data. Line 1 is the header 
+    var gamesList = [
+        [
+            'id', 'gameid', 'title', 'publisher', 'year', 'rating', 'status',
+            'notes', 'deviceId', 'deviceName', 'deviceShortname'
+        ]
+    ];
+    for (const game in games) {
+        gamesList.push([
+            games[game].UserGame.id,
+            games[game].id,
+            games[game].title,
+            games[game].publisher,
+            games[game].year,
+            games[game].UserGame.rating,
+            statusTypes[games[game].UserGame.status],
+            games[game].UserGame.notes,
+            games[game].Device.id,
+            games[game].Device.name,
+            games[game].Device.shortname
+        ]);
+    }
+
+    // Create CSV data
+    const csvData = await writeToString(gamesList).then(data => data);
+
+    // Send CSV output
+    res.setHeader('Content-Type', 'text/csv');
+    res.status(200);
+    res.send(csvData.toString());
+});
+
+
+/**
+ * @api {get} /api/collection/user/:username View collection as JSON
  * @apiName View Collection
  * @apiGroup Collection
  * @apiDescription Returns the game collection of the logged in user.
@@ -194,6 +270,7 @@ router.delete("/:gameid", auth, async function(req, res) {
     });
 });
 
+
 /**
  * @api {put} /api/collection Change information about a game in your collection
  * @apiName Change information about a game in your collection
@@ -275,82 +352,6 @@ router.put("/", auth, async function(req, res) {
     await findGame.save();
 
     return api_response(res, 200, "OK", []);
-});
-
-
-/**
- * @api {get} /api/collection/:username/csv Export collection as CSV
- * @apiName Export collection
- * @apiGroup Collection
- * @apiDescription Exports a users' game collection as CSV 
- * 
- * @apiHeader {String} Authorization Authorization token (If logged in)
- * @apiParam {String} username The username of the user you want to view
- * 
- * @apiError UserNotFound The specified user account does not exist
- * @apiError NotAuthorized This users' collection is private
- */
-router.get('/user/:username/csv', async function (req, res) {
-
-    // Status messages
-    const statusTypes = ['Unplayed', 'InProgress', 'Completed', 'WontFinish'];
-
-    const username = req.params['username'];
-    const token = req.header('Authorization');
-
-    // Get user
-    const user = await getUserByName(username);
- 
-    // user does not exist
-    if (! user) {
-        return api_response(res, 404, "UserNotFound", []);
-    }
-
-    // Only permit the collection to be viewed if a) you are viewing your
-    // profile, or b) the users' profile is public
-    if (user.public_profile === false && user.token != token) {
-        return api_response(res, 401, "NotAuthorized", []);
-    }
-
-    // Load list of games
-    var games = await user.getGames({
-        include: [
-            {
-                model: db.Device
-            }
-        ]
-    });
-
-    // Create an array to store the CSV data. Line 1 is the header 
-    var gamesList = [
-        [
-            'id', 'gameid', 'title', 'publisher', 'year', 'rating', 'status',
-            'notes', 'deviceId', 'deviceName', 'deviceShortname'
-        ]
-    ];
-    for (const game in games) {
-        gamesList.push([
-            games[game].UserGame.id,
-            games[game].id,
-            games[game].title,
-            games[game].publisher,
-            games[game].year,
-            games[game].UserGame.rating,
-            statusTypes[games[game].UserGame.status],
-            games[game].UserGame.notes,
-            games[game].Device.id,
-            games[game].Device.name,
-            games[game].Device.shortname
-        ]);
-    }
-
-    // Create CSV data
-    const csvData = await writeToString(gamesList).then(data => data);
-
-    // Send CSV output
-    res.setHeader('Content-Type', 'text/csv');
-    res.status(200);
-    res.send(csvData.toString());
 });
 
 module.exports = router;
