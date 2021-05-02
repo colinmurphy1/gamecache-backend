@@ -9,10 +9,13 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       notes: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
       },
       rating: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: true
       },
       UserId: {
         type: Sequelize.INTEGER
