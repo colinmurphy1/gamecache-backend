@@ -50,7 +50,7 @@ router.post('/register', async function(req, res) {
         password: await argon2.hash(data.password)
     }).then(function(value) {
         // user creation successful
-        return true;
+        return value;
     })
     .catch(function(error) {
         // Error encountered while creating user
@@ -63,6 +63,7 @@ router.post('/register', async function(req, res) {
     }
 
     return api_response(res, 200, "OK", {
+        "id": createUser.id,
         "username": data.username
     });
 });
@@ -186,9 +187,7 @@ router.put('/changepassword', auth, async function(req, res) {
     // Save changes
     user.save();
 
-    return api_response(res, 200, "OK", {
-        "message": "Password changed successfully"
-    });
+    return api_response(res, 200, "OK", []);
 });
 
 

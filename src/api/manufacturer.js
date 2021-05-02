@@ -12,7 +12,12 @@ var router = express.Router();
 
 // Manufacturer list
 router.get('/', async function(req, res) {
-    var manufacturer = await db.Manufacturer.findAll();
+    var manufacturer = await db.Manufacturer.findAll({
+        attributes: {
+            exclude: ['createdAt', 'updatedAt']
+        },
+        order: ['id']
+    });
     return api_response(res, 200, "OK", manufacturer);
 });
 

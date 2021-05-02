@@ -1,6 +1,4 @@
 var express = require('express');
-var argon2 = require('argon2');
-var crypto = require('crypto');
 const Joi = require('joi');
 
 var api_response = require('../lib/response');
@@ -55,7 +53,10 @@ router.post('/', auth_admin, async function(req, res) {
         return api_response(res, 500, "CreationError", []);
     }
 
-    return api_response(res, 200, "OK", []);
+    return api_response(res, 200, "OK", {
+        "id": newArticle.id,
+        "title": newArticle.title
+    });
 });
 
 
@@ -75,16 +76,19 @@ router.get('/', async function(req, res) {
         },
         attributes: {
             exclude: ['UserId']
-        }
+        },
+        // Show the newest posts first
+        order: [
+            ['createdAt', 'DESC']
+        ]
     })
     .then((model) => model)
     .catch((error) => {
-        console.log(error);
         return false
     });
 
     if (! newsPosts) {
-        return api_response(res, 200, "RetrievalError", "Could not load posts");
+        return api_response(res, 200, "RetrievalError", []);
     }
 
     return api_response(res, 200, "OK", newsPosts);
@@ -111,7 +115,10 @@ router.delete('/:postid', auth_admin, async function(req, res) {
     // Delete the post
     deletePost.destroy();
 
-    return api_response(res, 200, "OK", []);
+    return api_response(res, 200, "OK", {
+        "id": deletePost.id,
+        "title": deletePost.title
+    });
 
 });
 

@@ -26,7 +26,7 @@ router.get('/', async function(req, res) {
             attributes: ['id', 'name']
         },
         attributes: {
-            exclude: ['ManufacturerId']
+            exclude: ['ManufacturerId', 'createdAt', 'updatedAt']
         }
     });
     return api_response(res, 200, "OK", devices);

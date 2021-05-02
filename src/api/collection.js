@@ -15,14 +15,16 @@ const getUserByName = require('../lib/getUserByName');
 var router = express.Router();
 
 /**
- * @api {get} /api/collection View collection
+ * @api {get} /api/collection/user/:username View collection
  * @apiName View Collection
  * @apiGroup Collection
  * @apiDescription Returns the game collection of the logged in user.
  * 
- * @apiHeader {String} Authorization Authorization token
+ * @apiHeader {String} Authorization Authorization token (If logged in)
+ * @apiParam {String} username The username of the user you want to view
  * 
  * @apiError UserNotFound The specified user account does not exist
+ * @apiError NotAuthorized This users' collection is private
  * 
  * @apiSuccess {Object} games A list of games in your collection.
  */
@@ -260,7 +262,7 @@ router.put("/", auth, async function(req, res) {
 
     // Check for changes
     for (var key in data) {
-        // Skip game id
+        // You can't change the game ID
         if (key == "gameId") { continue; }
     
         // Make any required changes based on the specified data
@@ -277,12 +279,16 @@ router.put("/", auth, async function(req, res) {
 
 
 /**
- * @api {get} /api/collection/csv Export collection as CSV
+ * @api {get} /api/collection/:username/csv Export collection as CSV
  * @apiName Export collection
  * @apiGroup Collection
  * @apiDescription Exports a users' game collection as CSV 
  * 
- * @apiHeader {String} Authorization Authorization token
+ * @apiHeader {String} Authorization Authorization token (If logged in)
+ * @apiParam {String} username The username of the user you want to view
+ * 
+ * @apiError UserNotFound The specified user account does not exist
+ * @apiError NotAuthorized This users' collection is private
  */
 router.get('/user/:username/csv', async function (req, res) {
 

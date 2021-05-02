@@ -73,7 +73,7 @@ router.get('/user/:username', async function(req, res) {
     return api_response(res, 200, "OK", {
         "username": username,
         "bio": getUser.bio,
-        "favoriteGame": null
+        "dateJoined": getUser.createdAt
     });
 });
 
