@@ -105,6 +105,9 @@ var router = express.Router();
  * @apiSuccess {Object} games A list of games in your collection.
  */
 router.get('/user/:username', async function(req, res) {
+
+    const statusTypes = ['Unplayed', 'InProgress', 'Completed', 'WontFinish'];
+
     const username = req.params['username'];
     const token = req.header('Authorization');
 
@@ -142,6 +145,7 @@ router.get('/user/:username', async function(req, res) {
             'year': games[game].year,
             'rating': games[game].UserGame.rating,
             'status': games[game].UserGame.status,
+            'statusText': statusTypes[games[game].UserGame.status],
             'notes': games[game].UserGame.notes,
             'deviceId': games[game].Device.id,
             'deviceName': games[game].Device.name,
