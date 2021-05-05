@@ -21,7 +21,11 @@ module.exports = {
         allowNull: false
       },
       DeviceId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Devices',
+          key: 'id'
+        }
       },
       createdAt: {
         allowNull: false,
