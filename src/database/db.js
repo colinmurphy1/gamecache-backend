@@ -13,10 +13,8 @@ const sequelize = new Sequelize(
     }
 );
 
-
-/*
-    Define models
-*/
+// *****************************************************************************
+// Define models
 
 const db = {}
 db.Sequelize = Sequelize;
@@ -30,9 +28,8 @@ db.UserGame = require('../models/UserGame')(sequelize, Sequelize);
 db.NewsPost = require('../models/NewsPost')(sequelize, Sequelize);
 
 
-/*
-    Database associations
-*/
+// *****************************************************************************
+// Define associations
 
 // Manufacturer has many Devices
 db.Manufacturer.hasMany(db.Device);
@@ -49,8 +46,5 @@ db.Game.belongsToMany(db.User, { through: "UserGame" });
 // A user has many news posts, but a news post belongs to one user
 db.User.hasMany(db.NewsPost);
 db.NewsPost.belongsTo(db.User);
-
-// Sync database models
-//db.sequelize.sync();
 
 module.exports = db;
