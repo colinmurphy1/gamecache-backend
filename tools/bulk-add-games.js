@@ -27,8 +27,6 @@ async function getDeviceIdFromShortName(shortname) {
   return device.id;
 }
 
-getDeviceIdFromShortName()
-
 async function main(csvDir) {
   // get list of csv files
   const basepath = path.resolve(csvDir) + "/**/*.csv";
