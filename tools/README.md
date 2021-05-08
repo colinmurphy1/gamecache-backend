@@ -24,7 +24,10 @@ An example directory structure is below:
 
 After creating the directory structure, you can import your games.
 
-    node bulk-add-games.js basedir/
+    node ./tools/bulk-add-games.js /path/to/basedir/
+
+NOTE: In order for the tool to connect to the database, you must run this tool
+from the base directory (the one containing .env)
 
 ## CSV file requirements
 
