@@ -1,9 +1,23 @@
-# bulk-add-games
+# GameCache tools
+
+These tools are created to ease the setup and maintenance of Gamecache. Each
+tool must be run from the base directory of the application, so the environment
+variables can be loaded.
+
+## toggle-admin
+
+Toggles administrator rights on the specified user.
+
+**Usage:** `node ./tools/toggle-admin.js USERNAME`
+
+---
+
+## bulk-add-games
 
 This tool adds games to the database using CSV files containing game
 information. 
 
-## Usage 
+### Usage 
 
 1.  Create a base directory to store your CSV files
 2.  Inside the base directory, create a directory for each console, using the
@@ -26,17 +40,14 @@ After creating the directory structure, you can import your games.
 
     node ./tools/bulk-add-games.js /path/to/basedir/
 
-NOTE: In order for the tool to connect to the database, you must run this tool
-from the base directory (the one containing .env)
-
-## CSV file requirements
+### CSV file requirements
 
 CSV files contain the following data: `Title,Released,Developer`
 
 Each game line should look similar to `Half-Life,1998,Valve`
 
 
-## How to create the CSV files
+### How to create the CSV files
 
 1.  Go to Wikipedia. Look for a list, such as "[List of Windows Games][0]"
 
