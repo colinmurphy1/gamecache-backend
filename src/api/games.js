@@ -3,7 +3,6 @@ var express = require('express');
 const Joi = require('joi');
 
 var api_response = require('../lib/response');
-var auth = require('../middleware/auth.js');
 var auth_admin = require('../middleware/auth_admin.js');
 
 // Load database
@@ -54,7 +53,7 @@ router.get('/', async function(req, res) {
 
 
 // Add a game to the games list
-router.post('/', auth, async function(req, res) {
+router.post('/', auth_admin, async function(req, res) {
     const data = req.body;
 
     // Verify that all required data is passed
