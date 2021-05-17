@@ -4,6 +4,7 @@ const Joi = require('joi');
 
 var api_response = require('../lib/response');
 var auth_admin = require('../middleware/auth_admin.js');
+var getGameById = require('../lib/getGameById');
 
 // Load database
 var db = require('../database/db.js');
@@ -94,22 +95,32 @@ router.post('/', auth_admin, async function(req, res) {
     return api_response(res, 200, "OK", newGame);
 });
 
-// Delete a game (Admin only)
-router.delete('/:gameid', auth_admin, async function(req, res) {
+
+// View a single game
+router.get('/id/:gameid', async function(req, res) {
     const gameId = req.params['gameid'];
 
     // Find game by ID
-    var deleteGame = await db.Game.findOne({
-        where: {
-            id: gameId
-        }
-    })
-    .then(function(model) {
-        return model;
-    })
-    .catch(function(error) {
-        return false;
-    });
+    const game = await getGameById(gameId);
+
+    // Check if game exists
+    if (! game) {
+        return api_response(res, 404, "GameNotFound", "");
+    }
+
+    // Return game information
+    return api_response(res, 200, "OK", game);
+
+});
+
+
+
+// Delete a game (Admin only)
+router.delete('/id/:gameid', auth_admin, async function(req, res) {
+    const gameId = req.params['gameid'];
+
+    // Find game by ID
+    var deleteGame = await getGameById(gameId);
 
     if (! deleteGame) {
         return api_response(res, 404, "GameNotFound", "");
