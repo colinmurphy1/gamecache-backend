@@ -124,10 +124,23 @@ router.get('/id/:gameid', async function(req, res) {
         attributes: ['id', 'username']
     });
 
+    // Calculate average rating
+    // TODO: Do this in a cleaner way. Use an array? 
+    let starTotal = 0;
+    let starUsers = 0;
+    for (user of gameOwners) {
+        // skip unrated games
+        if (user.UserGame.rating === 0) continue; 
+
+        starTotal += user.UserGame.rating;
+        starUsers += 1;
+    }
+    const gameRating = starTotal / starUsers || 0;
 
     // Return game information
     return api_response(res, 200, "OK", {
         info: game,
+        rating: gameRating,
         owners: gameOwners
     });
 
