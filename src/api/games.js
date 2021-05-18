@@ -1,6 +1,7 @@
 // Load modules
 var express = require('express');
 const Joi = require('joi');
+const { Op } = require('sequelize');
 
 var api_response = require('../lib/response');
 var auth_admin = require('../middleware/auth_admin.js');
@@ -108,8 +109,27 @@ router.get('/id/:gameid', async function(req, res) {
         return api_response(res, 404, "GameNotFound", "");
     }
 
+    // Get users who own the game
+    const myToken = req.header('Authorization');
+
+    const gameOwners = await game.getUsers({
+        where: {
+            // Only show users who have a public profile, including yourself
+            [Op.or]: [
+                {public_profile: true},
+                // If there's no token specified, don't use it in the query
+                myToken ? {token: myToken} : {}
+            ]
+        },
+        attributes: ['id', 'username']
+    });
+
+
     // Return game information
-    return api_response(res, 200, "OK", game);
+    return api_response(res, 200, "OK", {
+        info: game,
+        owners: gameOwners
+    });
 
 });
 
