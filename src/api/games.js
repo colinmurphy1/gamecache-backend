@@ -140,7 +140,10 @@ router.get('/id/:gameid', async function(req, res) {
     // Return game information
     return api_response(res, 200, "OK", {
         info: game,
-        rating: gameRating,
+        rating: {
+            value: gameRating,
+            users: starUsers
+        },
         owners: gameOwners
     });
 
