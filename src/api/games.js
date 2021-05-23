@@ -17,7 +17,7 @@ var router = express.Router();
  * @apiName View all game
  * @apiGroup Game
  * 
- * @apiSuccess {Object} games The resulting list of games
+ * @apiSuccess {Object} data The resulting list of games
  * 
  * @apiError GameLoadError Could not retrieve the list of games
  */
@@ -42,15 +42,11 @@ router.get('/', async function(req, res) {
     });
 
     if (! getGames) {
-        return api_response(res, 404, "GameLoadError", {
-            "message": "Could not retrieve games"
-        });
+        return api_response(res, 404, "GameLoadError", []);
     }
 
     // Show the clean JSON list
-    return api_response(res, 200, "OK", {
-        "games": getGames
-    });
+    return api_response(res, 200, "OK", getGames);
 });
 
 
@@ -166,7 +162,7 @@ router.delete('/id/:gameid', auth_admin, async function(req, res) {
     deleteGame.destroy();
 
     return api_response(res, 200, "OK", {
-        "message": `"${deleteGame.title}" has been removed from the games table`,
+        "title": deleteGame.title,
         "gameId": deleteGame.id
     });
 });

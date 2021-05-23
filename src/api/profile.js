@@ -78,21 +78,22 @@ router.get('/user/:username', async function(req, res) {
 
     // Display a message if the user does not exist
     if (! getUser) {
-        return api_response(res, 404, "UserNotFound", []);
+        return api_response(res, 404, "UserNotFound", {});
     }
 
     // Profiles will only be visible if the profile is public, or you are
     // viewing your own profile
     const myToken = req.header('Authorization');
     if (getUser.public_profile === false && getUser.token != myToken) {
-        return api_response(res, 401, "NotAuthorized", []);
+        return api_response(res, 401, "NotAuthorized", {});
     }
 
     // Return profile
     return api_response(res, 200, "OK", {
         "username": username,
         "bio": getUser.bio,
-        "dateJoined": getUser.createdAt
+        "dateJoined": getUser.createdAt,
+        "admin": getUser.admin
     });
 });
 

@@ -105,9 +105,6 @@ var router = express.Router();
  * @apiSuccess {Object} games A list of games in your collection.
  */
 router.get('/user/:username', async function(req, res) {
-
-    const statusTypes = ['Unplayed', 'InProgress', 'Completed', 'WontFinish'];
-
     const username = req.params['username'];
     const token = req.header('Authorization');
 
@@ -145,7 +142,6 @@ router.get('/user/:username', async function(req, res) {
             'year': games[game].year,
             'rating': games[game].UserGame.rating,
             'status': games[game].UserGame.status,
-            'statusText': statusTypes[games[game].UserGame.status],
             'notes': games[game].UserGame.notes,
             'deviceId': games[game].Device.id,
             'deviceName': games[game].Device.name,
@@ -220,7 +216,10 @@ router.post('/', auth, async function(req, res) {
         return api_response(res, 500, "AddGameError", []);
     }
 
-    return api_response(res, 200, "OK", []);
+    return api_response(res, 200, "OK", {
+        "id": addGame.id,
+        "gameId": addGame.GameId
+    });
 });
 
 
@@ -254,24 +253,18 @@ router.delete("/:gameid", auth, async function(req, res) {
 
     // Check if the game exists
     if (! findGame) {
-        return api_response(res, 404, "GameNotFound", {
-            "message": "This game does not exist"
-        })
+        return api_response(res, 404, "GameNotFound", []);
     }
 
     // Verify ownership of the game
     if (findGame.UserId != req.user.id) {
-        return api_response(res, 403, "AccessDenied", {
-            "message": "This game does not belong to you"
-        })
+        return api_response(res, 403, "AccessDenied", []);
     }
 
     // Remove the game from the table
     findGame.destroy();
 
-    return api_response(res, 200, "OK", {
-        "message": `Removed game from collection`
-    });
+    return api_response(res, 200, "OK", []);
 });
 
 
@@ -329,16 +322,12 @@ router.put("/", auth, async function(req, res) {
 
     // Check if the game exists
     if (! findGame) {
-        return api_response(res, 404, "GameNotFound", {
-            "message": "This game does not exist"
-        })
+        return api_response(res, 404, "GameNotFound", [])
     }
 
     // Verify ownership of the game
     if (findGame.UserId != req.user.id) {
-        return api_response(res, 403, "AccessDenied", {
-            "message": "This game does not belong to you"
-        })
+        return api_response(res, 403, "AccessDenied", [])
     }
 
     // Check for changes
