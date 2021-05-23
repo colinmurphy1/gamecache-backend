@@ -93,7 +93,8 @@ router.get('/user/:username', async function(req, res) {
         "username": username,
         "bio": getUser.bio,
         "dateJoined": getUser.createdAt,
-        "admin": getUser.admin
+        "admin": getUser.admin,
+        "loggedin": getUser.token_expires_at > Date.now()
     });
 });
 
