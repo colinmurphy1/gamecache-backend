@@ -37,7 +37,7 @@ router.get('/all', async function(req, res) {
         attributes: {
             exclude: [
                 'email', 'password', 'public_profile', 'token',
-                'token_expires_at', 'bio', 'updatedAt', 'admin'
+                'bio', 'createdAt', 'updatedAt', 'admin'
             ]
         }
     })
@@ -53,7 +53,23 @@ router.get('/all', async function(req, res) {
         return api_response(res, 500, "UserLoadError", []);
     }
 
-    return api_response(res, 200, "OK", getUsers);
+
+    // Create a custom formatted user list. More may be displayed here in the
+    // future, such as game counts
+    const curTime = Date.now();
+    let userList = [];
+
+    for (user of getUsers) {
+        userList.push({
+            "id": user.id,
+            "username": user.username,
+            //"joinDate": user.createdAt,
+            "online": user.token_expires_at > curTime
+        });
+
+    }
+
+    return api_response(res, 200, "OK", userList);
 
 });
 
@@ -94,7 +110,7 @@ router.get('/user/:username', async function(req, res) {
         "bio": getUser.bio,
         "dateJoined": getUser.createdAt,
         "admin": getUser.admin,
-        "loggedin": getUser.token_expires_at > Date.now()
+        "online": getUser.token_expires_at > Date.now()
     });
 });
 
