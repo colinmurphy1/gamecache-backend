@@ -29,11 +29,14 @@ app.use(express.json());
 
 // Apply rate-limiting to API requests (100 req in 15 min)
 // TODO: Make this configurable in .env
-const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 200
-});
-app.use("/api/", apiLimiter);
+if (process.env.APP_RATELIMIT === "true") {
+    console.log("Rate limiting is enabled")
+    const apiLimiter = rateLimit({
+        windowMs: 15 * 60 * 1000,
+        max: 200
+    });
+    app.use("/api/", apiLimiter);
+}
 
 // Enable CORS for frontend API access
 app.use(cors());
@@ -63,5 +66,5 @@ app.use('/api/publisher', publisher);
 // Start the express server
 
 app.listen(process.env.APP_PORT, () => {
-    console.log("Server is running on port", process.env.APP_PORT);
+    console.log("Server is listening on port", process.env.APP_PORT);
 });
