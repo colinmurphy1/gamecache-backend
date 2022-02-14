@@ -8,12 +8,18 @@ async function getGameById(gameId) {
         where: {
             id: gameId
         },
-        include: {
-            model: db.Device,
-            attributes: ['id', 'name', 'shortname']
-        }
-        ,attributes: {
-            exclude: ['DeviceId']
+        include: [
+            {
+                model: db.Device,
+                attributes: ['id', 'name', 'shortname']
+            },
+            {
+                model: db.Developer,
+                attributes: ['id', 'name']
+            }
+        ],
+        attributes: {
+            exclude: ['DeviceId', 'DeveloperId', 'developerId']
         }
     }).then(function(model) {
         return model;
