@@ -211,4 +211,27 @@ router.post('/logout', auth, async function(req, res) {
     return api_response(res, 200, "OK", []);
 });
 
+/**
+ * @api {put} /api/auth/ping Renew token
+ * @apiName Ping
+ * @apiGroup Authentication
+ * @apiHeader {String} Authorization Authorization token
+ */
+router.put('/ping', auth, async (req, res) => {
+    // Get user 
+    let user = await getUserByName(req.user.username);
+
+    // Add another hour to the token expiry time
+
+    user.token_expires_at = Date.now() + (1000 * 60 * 60 * 2);
+
+    user.save();
+
+    return api_response(res, 200, "OK", {
+        username: user.username,
+        token: user.token,
+        token_expires_at: user.token_expires_at
+    });
+});
+
 module.exports = router;
