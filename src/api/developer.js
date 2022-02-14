@@ -13,17 +13,17 @@ var db = require('../database/db.js');
 var router = express.Router();
 
 /**
- * @api {get} /api/publisher View all publishers
- * @apiName View all publishers
+ * @api {get} /api/developer View all developers
+ * @apiName View all developers
  * @apiGroup Game
  * 
- * @apiSuccess {Object} data The resulting list of publishers
+ * @apiSuccess {Object} data The resulting list of game developers
  * 
- * @apiError PublisherLoadError Could not retrieve the list of publishers
+ * @apiError DeveloperLoadError Could not retrieve the list of game developers
  */
 router.get('/', async (req, res) => {
-  // Find all publishers
-  const publisher = await db.Publisher.findAll({
+  // Find all developers
+  const developer = await db.Developer.findAll({
     attributes: {
       exclude: ['createdAt', 'updatedAt'],
       order: ['id']
@@ -32,17 +32,17 @@ router.get('/', async (req, res) => {
   .then((value) => value)
   .catch((error) => false)
 
-  if(!publisher) {
-    return api_response(res, 500, "PublisherLoadError", []);
+  if(!developer) {
+    return api_response(res, 500, "DeveloperLoadError", []);
   }
 
-  // Return publishers
-  return api_response(res, 200, "OK", publisher);
+  // Return developer
+  return api_response(res, 200, "OK", developer);
 })
 
 
 
-router.post('/', async (req, res) => {
+router.post('/', auth_admin, async (req, res) => {
   const data = req.body;
 
   // Validate inputs
@@ -56,25 +56,25 @@ router.post('/', async (req, res) => {
     return api_response(res, 400, "InputValidationError", value);
   }
 
-  var createPublisher = await db.Publisher.create({
+  var createDeveloper = await db.Developer.create({
     name: data.name
   }).then(function(value) {
-    // Publisher creation successful
+    // Developer creation successful
     return value;
   })
   .catch(function(error) {
-    // Error encountered while creating publisher
+    // Error encountered while creating Developer
     return false;
   });
 
-  if (! createPublisher) {
-    return api_response(res, 500, "AddPublisherFailed", {});
+  if (! createDeveloper) {
+    return api_response(res, 500, "AddDeveloperFailed", {});
   }
 
   // Return api response
   return api_response(res, 200, "OK", {
     "name": data.name,
-    "publisherId": createPublisher.id
+    "developerId": createDeveloper.id
   })
 
 });

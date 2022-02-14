@@ -12,10 +12,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      PublisherId: {
+      DeveloperId: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Publishers',
+          model: 'Developers',
           key: 'id'
         },
       },

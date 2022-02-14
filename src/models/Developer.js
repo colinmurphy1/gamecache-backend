@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-    return sequelize.define('Publishers', {
-        // Publisher name
+    return sequelize.define('Developers', {
+        // Developer name
         name: {
             type: DataTypes.STRING,
             allowNull: false,

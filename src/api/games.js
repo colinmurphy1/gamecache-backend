@@ -31,7 +31,7 @@ router.get('/', async function(req, res) {
             attributes: ['id', 'name', 'shortname']
         },
         {
-            model: db.Publisher,
+            model: db.Developer,
             attributes: ['id', 'name']
         }
         ],
@@ -63,7 +63,7 @@ router.post('/', auth_admin, async function(req, res) {
     // Verify that all required data is passed
     const schema = Joi.object({
         title: Joi.string().required(),
-        publisherId: Joi.number().required(),
+        developerId: Joi.number().required(),
         year: Joi.number().required(),
         device: Joi.number().required()
     });
@@ -77,7 +77,7 @@ router.post('/', auth_admin, async function(req, res) {
     // Create game entry in the database
     var newGame = await db.Game.create({
         title: data.title,
-        publisherId: data.publisherId, //TODO GET PUBLISHER
+        developerId: data.developerId,
         year: data.year,
         DeviceId: data.device
     })

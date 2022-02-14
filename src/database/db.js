@@ -26,7 +26,7 @@ db.Device = require('../models/Device')(sequelize, Sequelize);
 db.Game = require('../models/Game')(sequelize, Sequelize);
 db.UserGame = require('../models/UserGame')(sequelize, Sequelize);
 db.NewsPost = require('../models/NewsPost')(sequelize, Sequelize);
-db.Publisher = require('../models/Publisher')(sequelize, Sequelize);
+db.Developer = require('../models/Developer')(sequelize, Sequelize);
 
 
 
@@ -45,9 +45,9 @@ db.Game.belongsTo(db.Device);
 db.User.belongsToMany(db.Game, { through: "UserGame" });
 db.Game.belongsToMany(db.User, { through: "UserGame" });
 
-// A Publisher has many Games
-db.Publisher.hasMany(db.Game);
-db.Game.belongsTo(db.Publisher);
+// A Developer has many Games
+db.Developer.hasMany(db.Game);
+db.Game.belongsTo(db.Developer);
 
 // A user has many news posts, but a news post belongs to one user
 db.User.hasMany(db.NewsPost);
