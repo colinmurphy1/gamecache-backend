@@ -25,10 +25,16 @@ router.get('/', async function(req, res) {
 
     // Find all games and their associated console (device)
     var getGames = await db.Game.findAll({
-        include: {
+        include: [
+        {
             model: db.Device,
             attributes: ['id', 'name', 'shortname']
         },
+        {
+            model: db.Publisher,
+            attributes: ['id', 'name']
+        }
+        ],
         attributes: {
             exclude: ['DeviceId', 'createdAt', 'updatedAt']
         }
@@ -57,7 +63,7 @@ router.post('/', auth_admin, async function(req, res) {
     // Verify that all required data is passed
     const schema = Joi.object({
         title: Joi.string().required(),
-        publisher: Joi.string().required(),
+        publisherId: Joi.number().required(),
         year: Joi.number().required(),
         device: Joi.number().required()
     });
@@ -71,7 +77,7 @@ router.post('/', auth_admin, async function(req, res) {
     // Create game entry in the database
     var newGame = await db.Game.create({
         title: data.title,
-        publisher: data.publisher,
+        publisherId: data.publisherId, //TODO GET PUBLISHER
         year: data.year,
         DeviceId: data.device
     })

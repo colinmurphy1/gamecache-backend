@@ -51,17 +51,17 @@ var router = express.Router();
     // Load list of games
     var games = await user.getGames({
         include: [
-            {
-                model: db.Device
-            }
+            {model: db.Device},
+            {model: db.Publisher}
         ]
     });
 
     // Create an array to store the CSV data. Line 1 is the header 
     var gamesList = [
         [
-            'id', 'gameid', 'title', 'publisher', 'year', 'rating', 'status',
-            'notes', 'deviceId', 'deviceName', 'deviceShortname'
+            'id', 'gameid', 'title', 'publisher', 'publisherId', 'year',
+            'rating', 'status', 'notes', 'deviceId', 'deviceName',
+            'deviceShortname'
         ]
     ];
     for (const game in games) {
@@ -69,7 +69,8 @@ var router = express.Router();
             games[game].UserGame.id,
             games[game].id,
             games[game].title,
-            games[game].publisher,
+            games[game].Publisher.name,
+            games[game].Publisher.id,
             games[game].year,
             games[game].UserGame.rating,
             statusTypes[games[game].UserGame.status],
@@ -125,9 +126,8 @@ router.get('/user/:username', async function(req, res) {
     // Load list of games
     var games = await user.getGames({
         include: [
-            {
-                model: db.Device
-            }
+            { model: db.Publisher },
+            { model: db.Device }
         ]
     });
 
@@ -138,7 +138,8 @@ router.get('/user/:username', async function(req, res) {
             'id': games[game].UserGame.id,
             'gameId': games[game].id,
             'title': games[game].title,
-            'publisher': games[game].publisher,
+            'publisher': games[game].Publisher.name,
+            'publisherId': games[game].Publisher.id,
             'year': games[game].year,
             'rating': games[game].UserGame.rating,
             'status': games[game].UserGame.status,

@@ -15,6 +15,7 @@ var device = require('./api/device.js');
 var manufacturer = require('./api/manufacturer.js');
 var collection = require('./api/collection.js');
 var news = require('./api/news.js');
+var publisher = require('./api/publisher.js');
 
 
 // *****************************************************************************
@@ -54,6 +55,8 @@ app.use('/api/device', device);
 app.use('/api/manufacturer', manufacturer);
 app.use('/api/collection', collection);
 app.use('/api/news', news);
+app.use('/api/publisher', publisher);
+
 
 
 // *****************************************************************************
