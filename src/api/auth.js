@@ -127,7 +127,8 @@ router.post('/login', async function(req, res) {
     return api_response(res, 200, "OK", {
         username: user.username,
         token: user.token,
-        token_expires_at: user.token_expires_at
+        token_expires_at: user.token_expires_at,
+        admin: user.admin
     });
 });
 
@@ -230,7 +231,8 @@ router.put('/ping', auth, async (req, res) => {
     return api_response(res, 200, "OK", {
         username: user.username,
         token: user.token,
-        token_expires_at: user.token_expires_at
+        token_expires_at: user.token_expires_at,
+        admin: user.admin
     });
 });
 
