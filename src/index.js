@@ -24,17 +24,16 @@ app.use(express.json());
 // *****************************************************************************
 // Middleware
 
-// Apply rate-limiting to API requests (100 req in 15 min)
+// Apply rate-limiting to API requests
 
 if (process.env.APP_RATELIMIT === "true") {
-    // Convert minutes to milliseconds
-    const windowMs = (process.env.APP_RATELIMIT_TIME || 15);
+    const window = (process.env.APP_RATELIMIT_TIME || 15);
     const max = process.env.APP_RATELIMIT_WINDOW || 500;
     console.log(
-        `API rate limiting is enabled: ${max} requests within ${windowMs} minutes`
+        `API rate limiting is enabled: ${max} requests within ${window} minutes`
     )
     const apiLimiter = rateLimit({
-        windowMs: windowMs * 60 * 1000,
+        windowMs: window * 60 * 1000, // convert minutes to milliseconds
         max
     });
     app.use("/api/", apiLimiter);
