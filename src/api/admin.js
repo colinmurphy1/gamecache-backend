@@ -61,8 +61,7 @@ router.get('/users', auth_admin, async (req, res) => {
     const getUsers = await db.User.findAll({
         attributes: {
             exclude: [
-                'password', 'token', 'bio', 'createdAt', 'updatedAt',
-                'token_expires_at'
+                'password', 'token', 'bio', 'createdAt', 'updatedAt'
             ]
         }
     })
@@ -79,7 +78,6 @@ router.get('/users', auth_admin, async (req, res) => {
 
 
     // Create an array of users
-    const curTime = Date.now();
     let userList = [];
 
     for (user of getUsers) {
@@ -89,7 +87,7 @@ router.get('/users', auth_admin, async (req, res) => {
             email: user.email,
             enabled: user.enabled,
             admin: user.admin,
-            online: user.token_expires_at > curTime,
+            online: user.token_expires_at > Date.now(),
             public_profile: user.public_profile
         })
     }
