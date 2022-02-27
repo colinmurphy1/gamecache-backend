@@ -30,7 +30,7 @@ app.use(express.json());
 
 if (process.env.APP_RATELIMIT === "true") {
     const window = (process.env.APP_RATELIMIT_TIME || 15);
-    const max = process.env.APP_RATELIMIT_WINDOW || 500;
+    const max = process.env.APP_RATELIMIT_MAX || 500;
     console.log(
         `API rate limiting is enabled: ${max} requests within ${window} minutes`
     )
