@@ -13,6 +13,8 @@ var manufacturer = require('./api/manufacturer.js');
 var collection = require('./api/collection.js');
 var news = require('./api/news.js');
 var developer = require('./api/developer.js');
+const admin = require('./api/admin.js');
+// TODO: Stop using var
 
 
 // *****************************************************************************
@@ -55,6 +57,7 @@ app.use('/api/manufacturer', manufacturer);
 app.use('/api/collection', collection);
 app.use('/api/news', news);
 app.use('/api/developer', developer);
+app.use('/api/admin', admin);
 
 
 
