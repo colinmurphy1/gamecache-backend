@@ -8,6 +8,7 @@ var getUserByName = require('../lib/getUserByName.js');
 var auth = require('../middleware/auth.js');
 
 var db = require('../database/db.js');
+const auth_admin = require('../middleware/auth_admin');
 
 var router = express.Router();
 
@@ -231,7 +232,7 @@ router.post('/logout', auth, async function(req, res) {
  */
 router.put('/ping', auth, async (req, res) => {
     // Get user 
-    let user = await getUserByName(req.user.username);
+    const user = await getUserByName(req.user.username);
 
     // Add another hour to the token expiry time
 
@@ -246,5 +247,52 @@ router.put('/ping', auth, async (req, res) => {
         admin: user.admin
     });
 });
+
+/**
+ * @api {put} /api/auth/toggle_status Enable/Disable user
+ * @apiName Enable/Disable User
+ * @apiGroup Authentication
+ * @apiHeader {String} Authorization Authorization token
+ */
+ router.put('/toggle_status', auth_admin, async function(req, res) {
+    const data = req.body;
+
+    // Get user 
+    const user = await getUserByName(data.username);
+
+    if (!user) {
+        return api_response(res, 404, "UserNotFound", {
+            message: `${data.username} is not a valid user.`
+        });
+    }
+
+    // Prevent locking yourself out
+    if (user.username == req.user.username) {
+        return api_response(res, 400, "Denied", {
+            message: "You cannot disable your own account."
+        })
+    }
+
+    // Disable and log out the user if enabled
+    if (user.enabled) {
+        // Disable user
+        user.enabled = false;
+        // Force logout
+        user.token_expires_at = Date.now();
+    }
+    else {
+        // Enable user
+        user.enabled = true;
+    }
+
+    // Save changes
+    user.save();
+
+    return api_response(res, 200, "OK", {
+        username: user.username,
+        enabled: user.enabled 
+    });
+});
+
 
 module.exports = router;
