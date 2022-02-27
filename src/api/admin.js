@@ -77,8 +77,25 @@ router.get('/users', auth_admin, async (req, res) => {
         return api_response(res, 500, "UserLoadError", {});
     }
 
+
+    // Create an array of users
+    const curTime = Date.now();
+    let userList = [];
+
+    for (user of getUsers) {
+        userList.push({
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            enabled: user.enabled,
+            admin: user.admin,
+            online: user.token_expires_at > curTime,
+            public_profile: user.public_profile
+        })
+    }
+
     // Return an array of users
-    return api_response(res, 200, "OK", getUsers);
+    return api_response(res, 200, "OK", userList);
 });
 
 
