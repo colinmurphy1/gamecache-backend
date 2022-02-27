@@ -47,7 +47,8 @@ router.post('/register', async function(req, res) {
     var createUser = await db.User.create({
         username: data.username,
         email: data.email,
-        password: await argon2.hash(data.password)
+        password: await argon2.hash(data.password),
+        enabled: true
     }).then(function(value) {
         // user creation successful
         return value;
@@ -59,7 +60,7 @@ router.post('/register', async function(req, res) {
     });
 
     if (! createUser) {
-        return api_response(res, 400, "UserCreationError", []);
+        return api_response(res, 400, "UserCreationError", {});
     }
 
     return api_response(res, 200, "OK", {
@@ -106,14 +107,19 @@ router.post('/login', async function(req, res) {
 
     // No user found
     if (! user) {
-        return api_response(res, 401, "Unauthorized", []);
+        return api_response(res, 401, "Unauthorized", {});
     }
 
     // Verify hash
     var matches = await argon2.verify(user.password, data.password);
     
     if (! matches) {
-        return api_response(res, 401, "Unauthorized", []);
+        return api_response(res, 401, "Unauthorized", {});
+    }
+
+    // Verify the user is enabled
+    if (! user.enabled) {
+        return api_response(res, 401, "UserDisabled", {});
     }
 
     // Generate a new random token, and set the expiration time to 1 hour from now.
@@ -178,6 +184,11 @@ router.put('/changepassword', auth, async function(req, res) {
         return api_response(res, 401, "Unauthorized", "");
     }
 
+    // Verify the user is enabled
+    if (! user.enabled) {
+        return api_response(res, 401, "UserDisabled", {});
+    }
+
     // Generate a new password hash
     user.password = await argon2.hash(data.new_password);
 
@@ -188,7 +199,7 @@ router.put('/changepassword', auth, async function(req, res) {
     // Save changes
     user.save();
 
-    return api_response(res, 200, "OK", []);
+    return api_response(res, 200, "OK", {});
 });
 
 
@@ -209,7 +220,7 @@ router.post('/logout', auth, async function(req, res) {
     // Save changes
     user.save();
 
-    return api_response(res, 200, "OK", []);
+    return api_response(res, 200, "OK", {});
 });
 
 /**

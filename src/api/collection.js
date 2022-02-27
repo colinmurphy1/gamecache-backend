@@ -39,13 +39,13 @@ var router = express.Router();
  
     // user does not exist
     if (! user) {
-        return api_response(res, 404, "UserNotFound", []);
+        return api_response(res, 404, "UserNotFound", {});
     }
 
     // Only permit the collection to be viewed if a) you are viewing your
     // profile, or b) the users' profile is public
     if (user.public_profile === false && user.token != token) {
-        return api_response(res, 401, "NotAuthorized", []);
+        return api_response(res, 401, "NotAuthorized", {});
     }
 
     // Load list of games
@@ -114,13 +114,18 @@ router.get('/user/:username', async function(req, res) {
  
     // user does not exist
     if (! user) {
-        return api_response(res, 404, "UserNotFound", []);
+        return api_response(res, 404, "UserNotFound", {});
+    }
+
+    // Verify the user is enabled
+    if (! user.enabled) {
+        return api_response(res, 401, "UserDisabled", {});
     }
 
     // Only permit the collection to be viewed if a) you are viewing your
     // profile, or b) the users' profile is public
     if (user.public_profile === false && user.token != token) {
-        return api_response(res, 401, "NotAuthorized", []);
+        return api_response(res, 401, "NotAuthorized", {});
     }
 
     // Load list of games
@@ -193,7 +198,7 @@ router.post('/', auth, async function(req, res) {
     const {error, value} = schema.validate(data, {abortEarly: false});
 
     if (error) {
-        return api_response(res, 400, "InputValidationError", []);
+        return api_response(res, 400, "InputValidationError", {});
     }
 
     // Add game to database, using game and user ids
@@ -214,7 +219,7 @@ router.post('/', auth, async function(req, res) {
 
     // Something went wrong adding the game
     if (! addGame) {
-        return api_response(res, 500, "AddGameError", []);
+        return api_response(res, 500, "AddGameError", {});
     }
 
     return api_response(res, 200, "OK", {
@@ -254,18 +259,18 @@ router.delete("/:gameid", auth, async function(req, res) {
 
     // Check if the game exists
     if (! findGame) {
-        return api_response(res, 404, "GameNotFound", []);
+        return api_response(res, 404, "GameNotFound", {});
     }
 
     // Verify ownership of the game
     if (findGame.UserId != req.user.id) {
-        return api_response(res, 403, "AccessDenied", []);
+        return api_response(res, 403, "AccessDenied", {});
     }
 
     // Remove the game from the table
     findGame.destroy();
 
-    return api_response(res, 200, "OK", []);
+    return api_response(res, 200, "OK", {});
 });
 
 
@@ -323,12 +328,12 @@ router.put("/", auth, async function(req, res) {
 
     // Check if the game exists
     if (! findGame) {
-        return api_response(res, 404, "GameNotFound", [])
+        return api_response(res, 404, "GameNotFound", {})
     }
 
     // Verify ownership of the game
     if (findGame.UserId != req.user.id) {
-        return api_response(res, 403, "AccessDenied", [])
+        return api_response(res, 403, "AccessDenied", {})
     }
 
     // Check for changes
@@ -345,7 +350,7 @@ router.put("/", auth, async function(req, res) {
     // Save changes
     await findGame.save();
 
-    return api_response(res, 200, "OK", []);
+    return api_response(res, 200, "OK", {});
 });
 
 module.exports = router;

@@ -27,7 +27,10 @@ router.get('/all', async function(req, res) {
     // Get all users that have public profiles, including the current
     // logged in user
     var getUsers = await db.User.findAll({
+        // User MUST be enabled AND your own profile OR a public profile to be
+        // visible in this list
         where: {
+            enabled: true,
             [Op.or]: [
                 {public_profile: true},
                 // If there's no token specified, don't use it in the query
@@ -95,6 +98,11 @@ router.get('/user/:username', async function(req, res) {
     // Display a message if the user does not exist
     if (! getUser) {
         return api_response(res, 404, "UserNotFound", {});
+    }
+
+    // Verify the user is enabled
+    if (! getUser.enabled) {
+        return api_response(res, 401, "UserDisabled", {});
     }
 
     // Profiles will only be visible if the profile is public, or you are

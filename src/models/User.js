@@ -47,6 +47,13 @@ module.exports = (sequelize, DataTypes) => {
         bio: {
             type: DataTypes.TEXT,
             allowNull: true
-        }
+        },
+
+        // Account status
+        enabled: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true,
+            allowNull: false
+        }   
     });
 }
