@@ -2,12 +2,19 @@ require('dotenv').config();
 
 const { Sequelize } = require('sequelize');
 
+// Converts true/false string to bool
+const APP_LOGGING = (String(process.env.APP_LOGGING).toLowerCase() == 'true');
+
+// If logging is enabled, use console.log
+const logging = APP_LOGGING ? console.log : false;
+
 const sequelize = new Sequelize(
     process.env.DB_NAME,
     process.env.DB_USER,
     process.env.DB_PASS,
     {
-        dialect: 'mariadb',
+        dialect: 'mysql',
+        logging,
         host: process.env.DB_HOST,
         port: process.env.DB_PORT
     }

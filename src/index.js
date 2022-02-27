@@ -4,9 +4,6 @@ const express = require('express');
 const rateLimit = require("express-rate-limit");
 const cors = require('cors');
 
-// lib
-var api_response = require('./lib/response.js');
-
 // Define API routes
 var auth = require('./api/auth.js');
 var profile = require('./api/profile.js');
@@ -28,12 +25,17 @@ app.use(express.json());
 // Middleware
 
 // Apply rate-limiting to API requests (100 req in 15 min)
-// TODO: Make this configurable in .env
+
 if (process.env.APP_RATELIMIT === "true") {
-    console.log("Rate limiting is enabled")
+    // Convert minutes to milliseconds
+    const windowMs = (process.env.APP_RATELIMIT_TIME || 15);
+    const max = process.env.APP_RATELIMIT_WINDOW || 500;
+    console.log(
+        `API rate limiting is enabled: ${max} requests within ${windowMs} minutes`
+    )
     const apiLimiter = rateLimit({
-        windowMs: 15 * 60 * 1000,
-        max: 200
+        windowMs: windowMs * 60 * 1000,
+        max
     });
     app.use("/api/", apiLimiter);
 }
@@ -44,11 +46,6 @@ app.use(cors());
 
 // *****************************************************************************
 // Routes
-
-// Return a PONG, to verify the API is up and running
-app.get('/ping', (req, res) => {
-    return api_response(res, 200, "PONG", []);
-});
 
 // Load routes from their specific files
 app.use('/api/auth', auth);
@@ -66,5 +63,5 @@ app.use('/api/developer', developer);
 // Start the express server
 
 app.listen(process.env.APP_PORT, () => {
-    console.log("Server is listening on port", process.env.APP_PORT);
+    console.log("\nServer is listening on port", process.env.APP_PORT);
 });
