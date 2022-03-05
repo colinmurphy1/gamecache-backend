@@ -88,7 +88,8 @@ router.get('/users', auth_admin, async (req, res) => {
             enabled: user.enabled,
             admin: user.admin,
             online: user.token_expires_at > Date.now(),
-            public_profile: user.public_profile
+            public_profile: user.public_profile,
+            last_ip: user.last_ip
         })
     }
 

@@ -3,14 +3,13 @@ var argon2 = require('argon2');
 var crypto = require('crypto');
 const Joi = require('joi');
 
-var api_response = require('../lib/response');
-var getUserByName = require('../lib/getUserByName.js');
-var auth = require('../middleware/auth.js');
+const api_response = require('../lib/response');
+const getUserByName = require('../lib/getUserByName.js');
+const auth = require('../middleware/auth.js');
 
-var db = require('../database/db.js');
-const auth_admin = require('../middleware/auth_admin');
+const db = require('../database/db.js');
 
-var router = express.Router();
+let router = express.Router();
 
 /**
  * @api {post} /api/auth/register Create a user account
@@ -90,6 +89,9 @@ router.post('/register', async function(req, res) {
 router.post('/login', async function(req, res) {
     // {"username": "Username-Here", "password": "Password-Here"}
     const data = req.body;
+
+    // get IP address
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     
     // Validate user input
     const schema = Joi.object({
@@ -126,6 +128,9 @@ router.post('/login', async function(req, res) {
     // Generate a new random token, and set the expiration time to 1 hour from now.
     user.token = crypto.randomBytes(64).toString('hex');
     user.token_expires_at = Date.now() + (1000 * 60 * 60 * 2);
+
+    // Save IP address
+    user.last_ip = ip;
 
     // Save this to the database 
     await user.save();
@@ -233,10 +238,12 @@ router.post('/logout', auth, async function(req, res) {
 router.put('/ping', auth, async (req, res) => {
     // Get user 
     const user = await getUserByName(req.user.username);
-
+    
     // Add another hour to the token expiry time
-
     user.token_expires_at = Date.now() + (1000 * 60 * 60 * 2);
+
+    // Set IP address
+    user.last_ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
     user.save();
 

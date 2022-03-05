@@ -54,6 +54,12 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.BOOLEAN,
             defaultValue: true,
             allowNull: false
-        }   
+        },
+
+        // IP address of the user
+        last_ip: {
+            type: DataTypes.STRING,
+            allowNull: false
+        }
     });
 }

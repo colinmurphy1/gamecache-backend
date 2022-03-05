@@ -5,21 +5,19 @@ const rateLimit = require("express-rate-limit");
 const cors = require('cors');
 
 // Define API routes
-var auth = require('./api/auth.js');
-var profile = require('./api/profile.js');
-var games = require('./api/games.js');
-var device = require('./api/device.js');
-var manufacturer = require('./api/manufacturer.js');
-var collection = require('./api/collection.js');
-var news = require('./api/news.js');
-var developer = require('./api/developer.js');
+const auth = require('./api/auth.js');
+const profile = require('./api/profile.js');
+const games = require('./api/games.js');
+const device = require('./api/device.js');
+const manufacturer = require('./api/manufacturer.js');
+const collection = require('./api/collection.js');
+const news = require('./api/news.js');
+const developer = require('./api/developer.js');
 const admin = require('./api/admin.js');
-// TODO: Stop using var
-
 
 // *****************************************************************************
 // Setup app
-var app = express();
+let app = express();
 app.use(express.json());
 
 
