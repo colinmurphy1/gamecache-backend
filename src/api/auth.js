@@ -30,6 +30,9 @@ let router = express.Router();
 router.post('/register', async function(req, res) {
     const data = req.body;
 
+    // get IP address
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
     // Validate user input
     const schema = Joi.object({
         username: Joi.string().alphanum().max(16),
@@ -48,7 +51,8 @@ router.post('/register', async function(req, res) {
         username: data.username,
         email: data.email,
         password: await argon2.hash(data.password),
-        enabled: true
+        enabled: true,
+        last_ip: ip
     }).then(function(value) {
         // user creation successful
         return value;
